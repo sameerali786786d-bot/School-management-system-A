@@ -1,0 +1,55 @@
+/* Responsive styles */
+
+@media (max-width: 991.98px) {
+  .sidebar {
+    transform: translateX(-100%);
+    width: var(--sidebar-width) !important;
+  }
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  .sidebar.collapsed {
+    width: var(--sidebar-width) !important;
+  }
+  .sidebar.collapsed .brand-text,
+  .sidebar.collapsed .nav-text,
+  .sidebar.collapsed .nav-section-title {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0 !important;
+  }
+  .sidebar.collapsed ~ .main-content {
+    margin-left: 0 !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .page-content { padding: 14px; }
+  .page-header h1 { font-size: 1.2rem; }
+  .stat-card { padding: 14px; }
+  .stat-info h3 { font-size: 1.25rem; }
+  .stat-icon { width: 40px; height: 40px; font-size: 1.1rem; }
+  .card-body { padding: 14px; }
+  .table { font-size: .8rem; }
+  .topbar { padding: 0 12px; }
+  .user-dropdown .user-name { display: none; }
+  .chart-container { height: 220px; }
+}
+
+@media (max-width: 575.98px) {
+  .stat-card { flex-direction: row; }
+  .btn-group-mobile { flex-direction: column; width: 100%; }
+  .btn-group-mobile .btn { width: 100%; margin-bottom: 6px; }
+  .action-btns { flex-wrap: wrap; }
+  .login-card { margin: 10px; }
+}
+
+/* Horizontal scroll tables on mobile */
+@media (max-width: 767.98px) {
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .table { min-width: 600px; }
+}
