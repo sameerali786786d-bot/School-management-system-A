@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THE SMART MODERN PUBLIC SCHOOL QAMBER</title>
+  <script>
+    // Redirect to login or dashboard
+    const user = localStorage.getItem('smps_currentUser');
+    window.location.href = user ? 'dashboard.html' : 'login.html';
+  </script>
+</head>
+<body>
+  <p>Redirecting...</p>
+</body>
+</html>
