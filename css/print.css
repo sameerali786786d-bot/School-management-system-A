@@ -1,0 +1,16 @@
+@media print {
+  body { background: #fff; font-size: 12pt; color: #000; }
+  .sidebar, .topbar, .no-print, .btn, .pagination, .modal, .toast-container { display: none !important; }
+  .main-content { margin-left: 0 !important; width: 100% !important; }
+  .page-content { padding: 0 !important; }
+  .card { box-shadow: none !important; border: 1px solid #ddd !important; break-inside: avoid; }
+  .stat-card { break-inside: avoid; }
+  a { text-decoration: none; color: #000; }
+  .table { font-size: 10pt; }
+  .badge { border: 1px solid #999; }
+  .report-card-header { text-align: center; margin-bottom: 20px; }
+  .report-card-header h2 { margin: 0; font-size: 18pt; }
+  .signature-area { margin-top: 40px; display: flex; justify-content: space-between; }
+  .signature-box { text-align: center; width: 200px; }
+  .signature-line { border-top: 1px solid #000; margin-top: 50px; padding-top: 6px; }
+}
