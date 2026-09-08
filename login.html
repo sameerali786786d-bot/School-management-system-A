@@ -7,8 +7,35 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="css/style.css" rel="stylesheet">
-  <link href="css/responsive.css" rel="stylesheet">
+  <style>
+    :root { --primary: #1e40af; --primary-dark: #1e3a8a; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; }
+    .login-page {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 40%, #3b82f6 100%);
+      padding: 16px;
+    }
+    .login-card {
+      background: #fff; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,.25);
+      width: 100%; max-width: 420px; overflow: hidden;
+    }
+    .login-header {
+      background: linear-gradient(135deg, #1e3a8a, #1e40af); color: #fff;
+      padding: 24px; text-align: center;
+    }
+    .login-header h1 { font-size: 1.15rem; font-weight: 700; margin: 0 0 4px; }
+    .login-header p { margin: 0; opacity: .85; font-size: .85rem; }
+    .login-body { padding: 24px; }
+    .demo-accounts {
+      background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px;
+      padding: 12px; margin-top: 16px; font-size: .8rem;
+    }
+    .demo-accounts code { background: #e2e8f0; padding: 1px 6px; border-radius: 4px; color: #be185d; }
+    .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
+    .btn-primary { background: #1e40af; border-color: #1e40af; }
+    .btn-primary:hover { background: #1e3a8a; border-color: #1e3a8a; }
+  </style>
 </head>
 <body>
   <div class="login-page">
@@ -22,25 +49,26 @@
         <div class="alert alert-warning py-2 small mb-3" role="alert">
           <i class="fas fa-info-circle me-1"></i> <strong>DEMO MODE</strong> — LocalStorage authentication only. Not for production use.
         </div>
-        <form id="loginForm" novalidate>
+        <div id="loginError" class="alert alert-danger py-2 small d-none" role="alert"></div>
+        <div id="loginSuccess" class="alert alert-success py-2 small d-none" role="alert"></div>
+
+        <form id="loginForm">
           <div class="mb-3">
             <label class="form-label" for="username">Username / Email</label>
             <div class="input-group">
               <span class="input-group-text bg-white"><i class="fas fa-user text-muted"></i></span>
-              <input type="text" class="form-control" id="username" name="username" placeholder="Enter username or email" required autocomplete="username">
+              <input type="text" class="form-control" id="username" placeholder="admin" autocomplete="username">
             </div>
-            <div class="invalid-feedback">Please enter username or email.</div>
           </div>
           <div class="mb-3">
             <label class="form-label" for="password">Password</label>
             <div class="input-group">
               <span class="input-group-text bg-white"><i class="fas fa-lock text-muted"></i></span>
-              <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required autocomplete="current-password">
-              <button class="btn btn-outline-secondary" type="button" id="togglePassword" aria-label="Show password">
+              <input type="password" class="form-control" id="password" placeholder="admin123" autocomplete="current-password">
+              <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                 <i class="fas fa-eye"></i>
               </button>
             </div>
-            <div class="invalid-feedback">Please enter password.</div>
           </div>
           <div class="d-flex justify-content-between align-items-center mb-3">
             <div class="form-check">
@@ -53,6 +81,7 @@
             <i class="fas fa-sign-in-alt me-2"></i>Login
           </button>
         </form>
+
         <div class="demo-accounts">
           <strong class="d-block mb-2"><i class="fas fa-key me-1"></i> Demo Accounts</strong>
           <div class="row g-1 small">
@@ -72,61 +101,161 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/storage.js"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/demo-data.js"></script>
   <script>
-    // Redirect if already logged in
-    if (Auth.isLoggedIn()) {
-      window.location.href = 'dashboard.html';
-    }
-    DemoData.seed();
-    Auth.init();
+    // Self-contained login - works even if other JS files fail to load
+    (function () {
+      var PREFIX = 'smps_';
+      var DEMO_USERS = [
+        { id: 'u1', username: 'admin', email: 'admin@smartschool.pk', password: 'admin123', role: 'admin', name: 'System Administrator' },
+        { id: 'u2', username: 'principal', email: 'principal@smartschool.pk', password: 'principal123', role: 'principal', name: 'Dr. Muhammad Ali Khan' },
+        { id: 'u3', username: 'teacher1', email: 'teacher@smartschool.pk', password: 'teacher123', role: 'teacher', name: 'Mrs. Fatima Zahra' },
+        { id: 'u4', username: 'accountant', email: 'accounts@smartschool.pk', password: 'account123', role: 'accountant', name: 'Mr. Bilal Ahmed' },
+        { id: 'u5', username: 'staff1', email: 'staff@smartschool.pk', password: 'staff123', role: 'staff', name: 'Mr. Imran Shah' }
+      ];
 
-    document.getElementById('togglePassword').addEventListener('click', function() {
-      const input = document.getElementById('password');
-      const icon = this.querySelector('i');
-      if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.replace('fa-eye', 'fa-eye-slash');
-      } else {
-        input.type = 'password';
-        icon.classList.replace('fa-eye-slash', 'fa-eye');
-      }
-    });
-
-    document.getElementById('forgotPassword').addEventListener('click', function(e) {
-      e.preventDefault();
-      alert('DEMO: Password reset is not available in demo mode.\n\nUse the sample accounts listed below the form.');
-    });
-
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const form = this;
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value;
-      const remember = document.getElementById('rememberMe').checked;
-
-      form.classList.add('was-validated');
-      if (!form.checkValidity()) return;
-
-      const btn = document.getElementById('loginBtn');
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Logging in...';
-
-      setTimeout(() => {
-        const result = Auth.login(username, password, remember);
-        if (result.success) {
-          window.location.href = 'dashboard.html';
+      function showError(msg) {
+        var el = document.getElementById('loginError');
+        var ok = document.getElementById('loginSuccess');
+        if (ok) ok.classList.add('d-none');
+        if (el) {
+          el.textContent = msg;
+          el.classList.remove('d-none');
         } else {
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Login';
-          Toast.show(result.message, 'error');
+          alert(msg);
         }
-      }, 400);
-    });
+      }
+
+      function showSuccess(msg) {
+        var el = document.getElementById('loginSuccess');
+        var err = document.getElementById('loginError');
+        if (err) err.classList.add('d-none');
+        if (el) {
+          el.textContent = msg;
+          el.classList.remove('d-none');
+        }
+      }
+
+      function hideMessages() {
+        var err = document.getElementById('loginError');
+        var ok = document.getElementById('loginSuccess');
+        if (err) err.classList.add('d-none');
+        if (ok) ok.classList.add('d-none');
+      }
+
+      function getUsers() {
+        try {
+          var raw = localStorage.getItem(PREFIX + 'users');
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length) return parsed;
+          }
+        } catch (e) {}
+        try {
+          localStorage.setItem(PREFIX + 'users', JSON.stringify(DEMO_USERS));
+        } catch (e) {}
+        return DEMO_USERS;
+      }
+
+      function doLogin(username, password, remember) {
+        var users = getUsers();
+        var user = null;
+        for (var i = 0; i < users.length; i++) {
+          var u = users[i];
+          var matchUser = (String(u.username).toLowerCase() === username.toLowerCase()) ||
+                          (String(u.email).toLowerCase() === username.toLowerCase());
+          if (matchUser && u.password === password) {
+            user = u;
+            break;
+          }
+        }
+        if (!user) return { success: false, message: 'Invalid username or password. Try: admin / admin123' };
+
+        var session = {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          loginAt: new Date().toISOString()
+        };
+        try {
+          localStorage.setItem(PREFIX + 'currentUser', JSON.stringify(session));
+          if (remember) localStorage.setItem(PREFIX + 'remember', 'true');
+          else localStorage.removeItem(PREFIX + 'remember');
+        } catch (e) {
+          return { success: false, message: 'Cannot save session. Check browser storage settings.' };
+        }
+        return { success: true, user: session };
+      }
+
+      // Already logged in?
+      try {
+        var existing = localStorage.getItem(PREFIX + 'currentUser');
+        if (existing) {
+          window.location.href = 'dashboard.html';
+          return;
+        }
+      } catch (e) {}
+
+      // Seed users
+      getUsers();
+
+      // Toggle password
+      document.getElementById('togglePassword').addEventListener('click', function () {
+        var input = document.getElementById('password');
+        var icon = this.querySelector('i');
+        if (input.type === 'password') {
+          input.type = 'text';
+          if (icon) { icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); }
+        } else {
+          input.type = 'password';
+          if (icon) { icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); }
+        }
+      });
+
+      document.getElementById('forgotPassword').addEventListener('click', function (e) {
+        e.preventDefault();
+        alert('DEMO: Use the sample accounts listed below.\n\nExample: admin / admin123');
+      });
+
+      document.getElementById('loginForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        hideMessages();
+
+        var username = (document.getElementById('username').value || '').trim();
+        var password = document.getElementById('password').value || '';
+        var remember = document.getElementById('rememberMe').checked;
+        var btn = document.getElementById('loginBtn');
+
+        if (!username) {
+          showError('Please enter username.');
+          document.getElementById('username').focus();
+          return;
+        }
+        if (!password) {
+          showError('Please enter password.');
+          document.getElementById('password').focus();
+          return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = 'Logging in...';
+
+        setTimeout(function () {
+          var result = doLogin(username, password, remember);
+          if (result.success) {
+            showSuccess('Login successful! Redirecting...');
+            setTimeout(function () {
+              window.location.href = 'dashboard.html';
+            }, 400);
+          } else {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Login';
+            showError(result.message);
+          }
+        }, 250);
+      });
+    })();
   </script>
 </body>
 </html>
