@@ -3,6 +3,8 @@
  * Passwords are simple for demo. In production use proper hashing + backend.
  */
 
+const AUTH_PREFIX = 'smps_';
+
 const Auth = {
   ROLES: {
     admin: {
@@ -45,45 +47,84 @@ const Auth = {
   ],
 
   init() {
-    if (!Storage.get('users') || Storage.getAll('users').length === 0) {
-      Storage.saveAll('users', this.DEMO_USERS);
+    try {
+      let users = [];
+      if (typeof Storage !== 'undefined' && Storage.getAll) {
+        users = Storage.getAll('users') || [];
+      }
+      if (!users.length) {
+        if (typeof Storage !== 'undefined' && Storage.saveAll) {
+          Storage.saveAll('users', this.DEMO_USERS);
+        } else {
+          localStorage.setItem(AUTH_PREFIX + 'users', JSON.stringify(this.DEMO_USERS));
+        }
+      }
+    } catch (e) {
+      console.error('Auth.init error', e);
+      localStorage.setItem(AUTH_PREFIX + 'users', JSON.stringify(this.DEMO_USERS));
     }
+  },
+
+  getUsers() {
+    try {
+      if (typeof Storage !== 'undefined' && Storage.getAll) {
+        const users = Storage.getAll('users');
+        if (users && users.length) return users;
+      }
+      const raw = localStorage.getItem(AUTH_PREFIX + 'users');
+      if (raw) return JSON.parse(raw);
+    } catch (e) {
+      console.error('getUsers error', e);
+    }
+    return this.DEMO_USERS;
   },
 
   login(username, password, remember = false) {
-    const users = Storage.getAll('users');
-    const user = users.find(u =>
-      (u.username === username || u.email === username) && u.password === password
-    );
-    if (!user) return { success: false, message: 'Invalid username or password' };
-    if (user.status === 'disabled') return { success: false, message: 'Account is disabled' };
+    try {
+      this.init();
+      const users = this.getUsers();
+      const user = users.find(u =>
+        (String(u.username).toLowerCase() === String(username).toLowerCase() ||
+         String(u.email).toLowerCase() === String(username).toLowerCase()) &&
+        u.password === password
+      );
+      if (!user) {
+        return { success: false, message: 'Invalid username or password' };
+      }
+      if (user.status === 'disabled') {
+        return { success: false, message: 'Account is disabled' };
+      }
 
-    const session = {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-      teacherId: user.teacherId || null,
-      loginAt: new Date().toISOString()
-    };
-    localStorage.setItem(STORAGE_PREFIX + 'currentUser', JSON.stringify(session));
-    if (remember) {
-      localStorage.setItem(STORAGE_PREFIX + 'remember', 'true');
-    } else {
-      localStorage.removeItem(STORAGE_PREFIX + 'remember');
+      const session = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        teacherId: user.teacherId || null,
+        loginAt: new Date().toISOString()
+      };
+      localStorage.setItem(AUTH_PREFIX + 'currentUser', JSON.stringify(session));
+      if (remember) {
+        localStorage.setItem(AUTH_PREFIX + 'remember', 'true');
+      } else {
+        localStorage.removeItem(AUTH_PREFIX + 'remember');
+      }
+      return { success: true, user: session };
+    } catch (e) {
+      console.error('Login error', e);
+      return { success: false, message: 'Login failed. Please try again.' };
     }
-    return { success: true, user: session };
   },
 
   logout() {
-    localStorage.removeItem(STORAGE_PREFIX + 'currentUser');
+    localStorage.removeItem(AUTH_PREFIX + 'currentUser');
     window.location.href = 'login.html';
   },
 
   getCurrentUser() {
     try {
-      const raw = localStorage.getItem(STORAGE_PREFIX + 'currentUser');
+      const raw = localStorage.getItem(AUTH_PREFIX + 'currentUser');
       return raw ? JSON.parse(raw) : null;
     } catch {
       return null;
@@ -124,5 +165,4 @@ const Auth = {
   }
 };
 
-const STORAGE_PREFIX = 'smps_';
 window.Auth = Auth;
