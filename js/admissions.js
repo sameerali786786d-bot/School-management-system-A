@@ -10,4 +10,3 @@ const PageModule = {
       <td>${Utils.getStatusBadge(a.status)}</td></tr>`).join('');
   }
 };
-
