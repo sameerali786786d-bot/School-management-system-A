@@ -34,7 +34,7 @@ const App = {
     return `
     <aside class="sidebar" id="appSidebar">
       <div class="sidebar-brand">
-        <div class="brand-icon">SM</div>
+        <div class="brand-icon"><img src="assets/images/logo.jpg" alt="School Logo"></div>
         <div class="brand-text">SMPS Qamber</div>
       </div>
       <nav class="sidebar-nav">
