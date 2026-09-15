@@ -35,6 +35,15 @@
     .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
     .btn-primary { background: #1e40af; border-color: #1e40af; }
     .btn-primary:hover { background: #1e3a8a; border-color: #1e3a8a; }
+  
+    .whatsapp-float {
+      position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px;
+      background: #25d366; color: #fff; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.75rem; box-shadow: 0 4px 14px rgba(37,211,102,.45);
+      z-index: 1060; text-decoration: none;
+    }
+    .whatsapp-float:hover { color: #fff; transform: scale(1.08); }
   </style>
 </head>
 <body>
@@ -259,5 +268,9 @@
       });
     })();
   </script>
+
+  <a id="whatsappFloat" class="whatsapp-float" href="https://wa.me/923267029939?text=Assalamualaikum%2C%20THE%20SMART%20MODERN%20PUBLIC%20SCHOOL%20QAMBER" target="_blank" rel="noopener noreferrer" title="WhatsApp: 0326-7029939" aria-label="Chat on WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
 </body>
 </html>
