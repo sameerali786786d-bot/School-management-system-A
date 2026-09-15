@@ -301,3 +301,17 @@ body {
   .main-content { margin-left: 0 !important; }
   .page-content { padding: 0 !important; }
 }
+
+
+.user-avatar.user-avatar-logo {
+  background: #fff !important;
+  padding: 0;
+  overflow: hidden;
+}
+.user-avatar.user-avatar-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
