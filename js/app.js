@@ -28,6 +28,7 @@ const App = {
 
     this.highlightActiveNav();
     this.applyPermissions();
+    this.ensureWhatsAppButton();
   },
 
   getSidebarHTML() {
@@ -109,6 +110,21 @@ const App = {
 
   getOverlayHTML() {
     return `<div class="sidebar-overlay" id="sidebarOverlay"></div>`;
+  },
+
+
+  ensureWhatsAppButton() {
+    if (document.getElementById('whatsappFloat')) return;
+    const btn = document.createElement('a');
+    btn.id = 'whatsappFloat';
+    btn.className = 'whatsapp-float';
+    btn.href = 'https://wa.me/923267029939?text=Assalamualaikum%2C%20THE%20SMART%20MODERN%20PUBLIC%20SCHOOL%20QAMBER';
+    btn.target = '_blank';
+    btn.rel = 'noopener noreferrer';
+    btn.title = 'WhatsApp: 0326-7029939';
+    btn.setAttribute('aria-label', 'Chat on WhatsApp');
+    btn.innerHTML = '<i class="fab fa-whatsapp"></i>';
+    document.body.appendChild(btn);
   },
 
   getTopbarHTML(user) {
