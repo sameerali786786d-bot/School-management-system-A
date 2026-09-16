@@ -167,6 +167,26 @@
         return DEMO_USERS;
       }
 
+      
+      function recordLoginHistory(user) {
+        try {
+          var entry = {
+            username: user.username,
+            name: user.name,
+            role: user.role,
+            loginAt: new Date().toISOString(),
+            device: (navigator.userAgent || '').substring(0, 80)
+          };
+          localStorage.setItem('smps_lastLogin', JSON.stringify(entry));
+          var hist = [];
+          try { hist = JSON.parse(localStorage.getItem('smps_loginHistory') || '[]'); } catch(e) {}
+          if (!Array.isArray(hist)) hist = [];
+          hist.unshift(entry);
+          if (hist.length > 30) hist = hist.slice(0, 30);
+          localStorage.setItem('smps_loginHistory', JSON.stringify(hist));
+        } catch (e) {}
+      }
+
       function doLogin(username, password, remember) {
         var users = getUsers();
         var user = null;
@@ -196,6 +216,7 @@
         } catch (e) {
           return { success: false, message: 'Cannot save session. Check browser storage settings.' };
         }
+        recordLoginHistory(session);
         return { success: true, user: session };
       }
 
