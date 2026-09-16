@@ -105,6 +105,22 @@ const Auth = {
         loginAt: new Date().toISOString()
       };
       localStorage.setItem(AUTH_PREFIX + 'currentUser', JSON.stringify(session));
+      try {
+        const entry = {
+          username: session.username,
+          name: session.name,
+          role: session.role,
+          loginAt: session.loginAt,
+          device: (navigator.userAgent || '').substring(0, 80)
+        };
+        localStorage.setItem('smps_lastLogin', JSON.stringify(entry));
+        let hist = [];
+        try { hist = JSON.parse(localStorage.getItem('smps_loginHistory') || '[]'); } catch (e) {}
+        if (!Array.isArray(hist)) hist = [];
+        hist.unshift(entry);
+        if (hist.length > 30) hist = hist.slice(0, 30);
+        localStorage.setItem('smps_loginHistory', JSON.stringify(hist));
+      } catch (e) {}
       if (remember) {
         localStorage.setItem(AUTH_PREFIX + 'remember', 'true');
       } else {
