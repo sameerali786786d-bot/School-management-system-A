@@ -2,12 +2,12 @@ const PageModule = {
   init() {
     document.getElementById('pageTitle').textContent = 'Settings';
     const s = Storage.get('settings') || {};
+    const user = Auth.getCurrentUser();
+    const isAdmin = user && user.role === 'admin';
 
     let lastLogin = null;
     let history = [];
-    try {
-      lastLogin = JSON.parse(localStorage.getItem('smps_lastLogin') || 'null');
-    } catch (e) {}
+    try { lastLogin = JSON.parse(localStorage.getItem('smps_lastLogin') || 'null'); } catch (e) {}
     try {
       history = JSON.parse(localStorage.getItem('smps_loginHistory') || '[]');
       if (!Array.isArray(history)) history = [];
@@ -15,8 +15,8 @@ const PageModule = {
 
     const lastLoginHtml = lastLogin
       ? `<div class="row g-2 small">
-          <div class="col-md-4"><strong>User:</strong> ${lastLogin.name || lastLogin.username || '-'}</div>
-          <div class="col-md-4"><strong>Role:</strong> ${lastLogin.role || '-'}</div>
+          <div class="col-md-4"><strong>User:</strong> ${this.esc(lastLogin.name || lastLogin.username)}</div>
+          <div class="col-md-4"><strong>Role:</strong> ${this.esc(lastLogin.role)}</div>
           <div class="col-md-4"><strong>Time:</strong> ${this.formatDateTime(lastLogin.loginAt)}</div>
         </div>`
       : '<p class="text-muted small mb-0">No login recorded yet.</p>';
@@ -25,17 +25,21 @@ const PageModule = {
       ? history.map((h, i) => `
         <tr>
           <td>${i + 1}</td>
-          <td>${h.name || h.username || '-'}</td>
-          <td><code>${h.username || '-'}</code></td>
-          <td><span class="badge bg-secondary">${h.role || '-'}</span></td>
+          <td>${this.esc(h.name || h.username)}</td>
+          <td><code>${this.esc(h.username)}</code></td>
+          <td><span class="badge bg-secondary">${this.esc(h.role)}</span></td>
           <td>${this.formatDateTime(h.loginAt)}</td>
         </tr>`).join('')
       : '<tr><td colspan="5" class="text-center text-muted">No login history yet</td></tr>';
+
+    const usersTab = isAdmin ? `
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabUsers" type="button">Users</button></li>` : '';
 
     document.querySelector('.card-body').innerHTML = `
       <ul class="nav nav-tabs mb-3" role="tablist">
         <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabSchool" type="button">School Settings</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabLogin" type="button">Login History</button></li>
+        ${usersTab}
       </ul>
 
       <div class="tab-content">
@@ -58,9 +62,8 @@ const PageModule = {
           </form>
           <div class="alert alert-info mt-3 small mb-0">
             <i class="fas fa-user-circle me-1"></i>
-            <strong>Profile Photo</strong> alag hai — top-right menu se <em>Profile Photo</em> kholen (Settings se alag).
+            <strong>Profile Photo</strong> alag hai — top-right menu → <em>Profile Photo</em>.
           </div>
-          <div class="alert alert-warning mt-2 small mb-0"><i class="fas fa-info-circle me-1"></i> DEMO MODE — Settings LocalStorage mein save hoti hain.</div>
         </div>
 
         <div class="tab-pane fade" id="tabLogin">
@@ -68,26 +71,90 @@ const PageModule = {
             <div class="card-header bg-light py-2"><strong><i class="fas fa-clock me-1"></i> Last Login</strong></div>
             <div class="card-body">${lastLoginHtml}</div>
           </div>
-
           <div class="d-flex justify-content-between align-items-center mb-2">
             <h6 class="mb-0 text-primary">Login History</h6>
             <button type="button" class="btn btn-sm btn-outline-danger" id="clearLoginHistory">Clear History</button>
           </div>
           <div class="table-responsive">
             <table class="table table-sm table-hover align-middle">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Name</th>
-                  <th>Username</th>
-                  <th>Role</th>
-                  <th>Login Time</th>
-                </tr>
-              </thead>
+              <thead><tr><th>#</th><th>Name</th><th>Username</th><th>Role</th><th>Login Time</th></tr></thead>
               <tbody>${historyRows}</tbody>
             </table>
           </div>
-          <p class="text-muted small mb-0">Last 30 logins save hoti hain. Future logins yahan automatically add hongi.</p>
+        </div>
+
+        ${isAdmin ? `
+        <div class="tab-pane fade" id="tabUsers">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0 text-primary">Manage Users</h6>
+            <button type="button" class="btn btn-primary btn-sm" id="btnAddUser"><i class="fas fa-plus me-1"></i>Add User</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="usersTableBody"></tbody>
+            </table>
+          </div>
+          <div class="alert alert-warning small mt-2 mb-0">
+            Demo logins: <code>admin</code> / <code>bilal1234*</code> ·
+            <code>teacher1</code> / <code>teacher123</code>
+          </div>
+        </div>` : ''}
+      </div>
+
+      <!-- Add/Edit User Modal -->
+      <div class="modal fade" id="userModal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="userModalTitle">Add User</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="userForm">
+              <div class="modal-body">
+                <input type="hidden" id="userEditId">
+                <div class="mb-2">
+                  <label class="form-label">Full Name *</label>
+                  <input type="text" class="form-control" id="userName" required>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Username *</label>
+                  <input type="text" class="form-control" id="userUsername" required>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" id="userEmail">
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Password *</label>
+                  <input type="text" class="form-control" id="userPassword" required placeholder="Enter password">
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Role *</label>
+                  <select class="form-select" id="userRole" required>
+                    <option value="admin">Admin</option>
+                    <option value="principal">Principal</option>
+                    <option value="teacher">Teacher</option>
+                    <option value="accountant">Accountant</option>
+                    <option value="staff">Staff</option>
+                  </select>
+                </div>
+                <div class="mb-0">
+                  <label class="form-label">Status</label>
+                  <select class="form-select" id="userStatus">
+                    <option value="active">Active</option>
+                    <option value="disabled">Disabled</option>
+                  </select>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save User</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>`;
 
@@ -106,7 +173,7 @@ const PageModule = {
       Toast.show('Settings saved', 'success');
     });
 
-    document.getElementById('resetDemo').addEventListener('click', async () => {
+    document.getElementById('resetDemo')?.addEventListener('click', async () => {
       if (!(await Utils.confirmDelete('This will clear ALL data and re-seed demo data. Continue?'))) return;
       Storage.clearAll();
       DemoData.seed();
@@ -114,13 +181,124 @@ const PageModule = {
       setTimeout(() => location.reload(), 1000);
     });
 
-    document.getElementById('clearLoginHistory').addEventListener('click', async () => {
+    document.getElementById('clearLoginHistory')?.addEventListener('click', async () => {
       if (!(await Utils.confirmDelete('Clear all login history?'))) return;
       localStorage.removeItem('smps_loginHistory');
       localStorage.removeItem('smps_lastLogin');
       Toast.show('Login history cleared', 'success');
       setTimeout(() => location.reload(), 500);
     });
+
+    if (isAdmin) {
+      this.renderUsers();
+      document.getElementById('btnAddUser')?.addEventListener('click', () => this.openUserModal());
+      document.getElementById('userForm')?.addEventListener('submit', e => this.saveUser(e));
+    }
+  },
+
+  getUsersList() {
+    if (typeof Auth !== 'undefined' && Auth.getUsers) return Auth.getUsers();
+    try {
+      return JSON.parse(localStorage.getItem('smps_users') || '[]') || [];
+    } catch (e) {
+      return [];
+    }
+  },
+
+  saveUsersList(users) {
+    if (typeof Storage !== 'undefined' && Storage.saveAll) Storage.saveAll('users', users);
+    localStorage.setItem('smps_users', JSON.stringify(users));
+  },
+
+  renderUsers() {
+    const tbody = document.getElementById('usersTableBody');
+    if (!tbody) return;
+    const users = this.getUsersList();
+    if (!users.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No users</td></tr>';
+      return;
+    }
+    tbody.innerHTML = users.map(u => `
+      <tr>
+        <td class="fw-medium">${this.esc(u.name)}</td>
+        <td><code>${this.esc(u.username)}</code></td>
+        <td>${this.esc(u.email || '-')}</td>
+        <td><span class="badge bg-primary">${this.esc(u.role)}</span></td>
+        <td>${Utils.getStatusBadge(u.status || 'active')}</td>
+        <td>
+          <button class="btn btn-sm btn-outline-primary" onclick="PageModule.openUserModal('${u.id}')"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-sm btn-outline-danger" onclick="PageModule.deleteUser('${u.id}')"><i class="fas fa-trash"></i></button>
+        </td>
+      </tr>`).join('');
+  },
+
+  openUserModal(id = null) {
+    document.getElementById('userForm').reset();
+    document.getElementById('userEditId').value = id || '';
+    document.getElementById('userModalTitle').textContent = id ? 'Edit User' : 'Add User';
+    if (id) {
+      const u = this.getUsersList().find(x => x.id === id);
+      if (u) {
+        document.getElementById('userName').value = u.name || '';
+        document.getElementById('userUsername').value = u.username || '';
+        document.getElementById('userEmail').value = u.email || '';
+        document.getElementById('userPassword').value = u.password || '';
+        document.getElementById('userRole').value = u.role || 'teacher';
+        document.getElementById('userStatus').value = u.status || 'active';
+      }
+    }
+    new bootstrap.Modal(document.getElementById('userModal')).show();
+  },
+
+  saveUser(e) {
+    e.preventDefault();
+    const id = document.getElementById('userEditId').value;
+    const username = document.getElementById('userUsername').value.trim();
+    const password = document.getElementById('userPassword').value;
+    const name = document.getElementById('userName').value.trim();
+    const email = document.getElementById('userEmail').value.trim();
+    const role = document.getElementById('userRole').value;
+    const status = document.getElementById('userStatus').value;
+
+    if (!username || !password || !name) {
+      Toast.show('Name, username and password required', 'warning');
+      return;
+    }
+
+    let users = this.getUsersList();
+    const duplicate = users.find(u => u.username === username && u.id !== id);
+    if (duplicate) {
+      Toast.show('Username already exists', 'error');
+      return;
+    }
+
+    if (id) {
+      users = users.map(u => u.id === id ? { ...u, name, username, email, password, role, status } : u);
+      Toast.show('User updated', 'success');
+    } else {
+      users.push({
+        id: 'u_' + Date.now(),
+        name, username, email, password, role, status,
+        avatar: null
+      });
+      Toast.show('User added', 'success');
+    }
+    this.saveUsersList(users);
+    bootstrap.Modal.getInstance(document.getElementById('userModal')).hide();
+    this.renderUsers();
+  },
+
+  async deleteUser(id) {
+    const users = this.getUsersList();
+    const u = users.find(x => x.id === id);
+    if (u && u.username === 'admin') {
+      Toast.show('Cannot delete main admin account', 'warning');
+      return;
+    }
+    if (!(await Utils.confirmDelete('Delete this user?'))) return;
+    this.saveUsersList(users.filter(x => x.id !== id));
+    Toast.show('User deleted', 'success');
+    this.renderUsers();
   },
 
   formatDateTime(iso) {
@@ -132,9 +310,7 @@ const PageModule = {
         day: '2-digit', month: 'short', year: 'numeric',
         hour: '2-digit', minute: '2-digit'
       });
-    } catch (e) {
-      return iso;
-    }
+    } catch (e) { return iso; }
   },
 
   esc(v) {

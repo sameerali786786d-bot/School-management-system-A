@@ -39,7 +39,7 @@ const Auth = {
   },
 
   DEMO_USERS: [
-    { id: 'u1', username: 'admin', email: 'admin@smartschool.pk', password: 'admin123', role: 'admin', name: 'System Administrator', avatar: null },
+    { id: 'u1', username: 'admin', email: 'admin@smartschool.pk', password: 'bilal1234*', role: 'admin', name: 'System Administrator', avatar: null },
     { id: 'u2', username: 'principal', email: 'principal@smartschool.pk', password: 'principal123', role: 'principal', name: 'Dr. Muhammad Ali Khan', avatar: null },
     { id: 'u3', username: 'teacher1', email: 'teacher@smartschool.pk', password: 'teacher123', role: 'teacher', name: 'Mrs. Fatima Zahra', avatar: null, teacherId: 't1' },
     { id: 'u4', username: 'accountant', email: 'accounts@smartschool.pk', password: 'account123', role: 'accountant', name: 'Mr. Bilal Ahmed', avatar: null },
@@ -53,12 +53,22 @@ const Auth = {
         users = Storage.getAll('users') || [];
       }
       if (!users.length) {
-        if (typeof Storage !== 'undefined' && Storage.saveAll) {
-          Storage.saveAll('users', this.DEMO_USERS);
-        } else {
-          localStorage.setItem(AUTH_PREFIX + 'users', JSON.stringify(this.DEMO_USERS));
+        users = this.DEMO_USERS.slice();
+      } else {
+        // ensure admin password is updated + teacher accounts exist
+        const admin = users.find(u => u.username === 'admin');
+        if (admin) admin.password = 'bilal1234*';
+        else users.unshift(this.DEMO_USERS[0]);
+        const hasTeacher = users.some(u => u.role === 'teacher');
+        if (!hasTeacher) {
+          const t = this.DEMO_USERS.find(u => u.role === 'teacher');
+          if (t) users.push(t);
         }
       }
+      if (typeof Storage !== 'undefined' && Storage.saveAll) {
+        Storage.saveAll('users', users);
+      }
+      localStorage.setItem(AUTH_PREFIX + 'users', JSON.stringify(users));
     } catch (e) {
       console.error('Auth.init error', e);
       localStorage.setItem(AUTH_PREFIX + 'users', JSON.stringify(this.DEMO_USERS));
