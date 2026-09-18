@@ -92,23 +92,9 @@
             <i class="fas fa-sign-in-alt me-2"></i>Login
           </button>
         </form>
-
-        <div class="demo-accounts">
-          <strong class="d-block mb-2"><i class="fas fa-key me-1"></i> Demo Accounts</strong>
-          <div class="row g-1 small">
-            <div class="col-6"><code>admin</code> / <code>bilal1234*</code></div>
-            <div class="col-6 text-muted">Admin</div>
-            <div class="col-6"><code>principal</code> / <code>principal123</code></div>
-            <div class="col-6 text-muted">Principal</div>
-            <div class="col-6"><code>teacher1</code> / <code>teacher123</code></div>
-            <div class="col-6 text-muted">Teacher</div>
-            <div class="col-6"><code>accountant</code> / <code>account123</code></div>
-            <div class="col-6 text-muted">Accountant</div>
-            <div class="col-6"><code>staff1</code> / <code>staff123</code></div>
-            <div class="col-6 text-muted">Staff</div>
-          </div>
-        </div>
       </div>
+    </div>
+  </div>
     </div>
   </div>
 
@@ -117,7 +103,7 @@
     (function () {
       var PREFIX = 'smps_';
       var DEMO_USERS = [
-        { id: 'u1', username: 'admin', email: 'admin@smartschool.pk', password: 'bilal1234*', role: 'admin', name: 'System Administrator' },
+        { id: 'u1', username: 'admin', email: 'admin@smartschool.pk', password: 'bilal1234*', role: 'admin', name: 'System Administrator', phone: '03267029939' },
         { id: 'u2', username: 'principal', email: 'principal@smartschool.pk', password: 'principal123', role: 'principal', name: 'Dr. Muhammad Ali Khan' },
         { id: 'u3', username: 'teacher1', email: 'teacher@smartschool.pk', password: 'teacher123', role: 'teacher', name: 'Mrs. Fatima Zahra' },
         { id: 'u4', username: 'accountant', email: 'accounts@smartschool.pk', password: 'account123', role: 'accountant', name: 'Mr. Bilal Ahmed' },
@@ -209,7 +195,7 @@
             break;
           }
         }
-        if (!user) return { success: false, message: 'Invalid username or password. Try: admin / bilal1234*' };
+        if (!user) return { success: false, message: 'Invalid username or password. Please check your username and password' };
 
         var session = {
           id: user.id,
@@ -257,7 +243,7 @@
 
       document.getElementById('forgotPassword').addEventListener('click', function (e) {
         e.preventDefault();
-        alert('DEMO: Use the sample accounts listed below.\n\nExample: admin / bilal1234*');
+        alert('Please contact admin for login help.\nWhatsApp: 0326-7029939');
       });
 
       document.getElementById('loginForm').addEventListener('submit', function (e) {
