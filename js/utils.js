@@ -16,7 +16,7 @@ const Utils = {
   whatsAppButton(phone, size = 'sm') {
     const link = this.whatsAppLink(phone);
     if (!link) return '';
-    return `<a href="${link}" target="_blank" rel="noopener noreferrer" class="btn btn-${size} btn-success" title="WhatsApp ${phone}"><i class="fab fa-whatsapp"></i></a>`;
+    return `<a href="${link}" target="_blank" rel="noopener noreferrer" class="btn btn-${size} btn-success" title="WhatsApp: ${phone}"><i class="fab fa-whatsapp me-1"></i>Chat</a>`;
   },
 
   formatDate(dateStr, format = 'DD/MM/YYYY') {
