@@ -97,9 +97,10 @@ const PageModule = {
               <tbody id="usersTableBody"></tbody>
             </table>
           </div>
-          <div class="alert alert-warning small mt-2 mb-0">
-            Demo logins: <code>admin</code> / <code>bilal1234*</code> ·
-            <code>teacher1</code> / <code>teacher123</code>
+          <div class="alert alert-info small mt-2 mb-0">
+            <i class="fab fa-whatsapp text-success me-1"></i>
+            Admin WhatsApp contact: <strong>0326-7029939</strong>
+            <a href="https://wa.me/923267029939" target="_blank" class="btn btn-sm btn-success ms-2"><i class="fab fa-whatsapp"></i> Chat</a>
           </div>
         </div>` : ''}
       </div>
@@ -126,6 +127,10 @@ const PageModule = {
                 <div class="mb-2">
                   <label class="form-label">Email</label>
                   <input type="email" class="form-control" id="userEmail">
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Phone / WhatsApp</label>
+                  <input type="tel" class="form-control" id="userPhone" placeholder="03XXXXXXXXX">
                 </div>
                 <div class="mb-2">
                   <label class="form-label">Password *</label>
@@ -242,6 +247,7 @@ const PageModule = {
         document.getElementById('userName').value = u.name || '';
         document.getElementById('userUsername').value = u.username || '';
         document.getElementById('userEmail').value = u.email || '';
+        document.getElementById('userPhone').value = u.phone || '';
         document.getElementById('userPassword').value = u.password || '';
         document.getElementById('userRole').value = u.role || 'teacher';
         document.getElementById('userStatus').value = u.status || 'active';
@@ -257,6 +263,7 @@ const PageModule = {
     const password = document.getElementById('userPassword').value;
     const name = document.getElementById('userName').value.trim();
     const email = document.getElementById('userEmail').value.trim();
+    const phone = document.getElementById('userPhone').value.trim();
     const role = document.getElementById('userRole').value;
     const status = document.getElementById('userStatus').value;
 
@@ -273,12 +280,12 @@ const PageModule = {
     }
 
     if (id) {
-      users = users.map(u => u.id === id ? { ...u, name, username, email, password, role, status } : u);
+      users = users.map(u => u.id === id ? { ...u, name, username, email, phone, password, role, status } : u);
       Toast.show('User updated', 'success');
     } else {
       users.push({
         id: 'u_' + Date.now(),
-        name, username, email, password, role, status,
+        name, username, email, phone, password, role, status,
         avatar: null
       });
       Toast.show('User added', 'success');

@@ -34,6 +34,7 @@ const Teachers = {
         <td>
           <div class="action-btns">
             <button class="btn btn-sm btn-outline-primary" onclick="Teachers.openModal('${t.id}')"><i class="fas fa-edit"></i></button>
+            ${Utils.whatsAppButton(t.phone)}
             <button class="btn btn-sm btn-outline-danger" onclick="Teachers.remove('${t.id}')"><i class="fas fa-trash"></i></button>
           </div>
         </td>

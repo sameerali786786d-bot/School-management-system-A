@@ -3,6 +3,22 @@
  */
 
 const Utils = {
+
+  whatsAppLink(phone) {
+    if (!phone) return null;
+    let p = String(phone).replace(/[^\d+]/g, '');
+    if (p.startsWith('+')) p = p.slice(1);
+    if (p.startsWith('0')) p = '92' + p.slice(1);
+    if (p.length < 10) return null;
+    return 'https://wa.me/' + p;
+  },
+
+  whatsAppButton(phone, size = 'sm') {
+    const link = this.whatsAppLink(phone);
+    if (!link) return '';
+    return `<a href="${link}" target="_blank" rel="noopener noreferrer" class="btn btn-${size} btn-success" title="WhatsApp ${phone}"><i class="fab fa-whatsapp"></i></a>`;
+  },
+
   formatDate(dateStr, format = 'DD/MM/YYYY') {
     if (!dateStr) return '-';
     const d = new Date(dateStr);

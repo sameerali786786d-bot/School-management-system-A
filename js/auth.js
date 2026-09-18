@@ -39,7 +39,7 @@ const Auth = {
   },
 
   DEMO_USERS: [
-    { id: 'u1', username: 'admin', email: 'admin@smartschool.pk', password: 'bilal1234*', role: 'admin', name: 'System Administrator', avatar: null },
+    { id: 'u1', username: 'admin', email: 'admin@smartschool.pk', password: 'bilal1234*', role: 'admin', name: 'System Administrator', phone: '03267029939', avatar: null },
     { id: 'u2', username: 'principal', email: 'principal@smartschool.pk', password: 'principal123', role: 'principal', name: 'Dr. Muhammad Ali Khan', avatar: null },
     { id: 'u3', username: 'teacher1', email: 'teacher@smartschool.pk', password: 'teacher123', role: 'teacher', name: 'Mrs. Fatima Zahra', avatar: null, teacherId: 't1' },
     { id: 'u4', username: 'accountant', email: 'accounts@smartschool.pk', password: 'account123', role: 'accountant', name: 'Mr. Bilal Ahmed', avatar: null },

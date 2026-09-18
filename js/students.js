@@ -101,6 +101,7 @@ const Students = {
           <div class="action-btns">
             <button class="btn btn-sm btn-outline-info" title="View" onclick="Students.view('${s.id}')"><i class="fas fa-eye"></i></button>
             <button class="btn btn-sm btn-outline-primary" title="Edit" onclick="Students.openModal('${s.id}')"><i class="fas fa-edit"></i></button>
+            ${Utils.whatsAppButton(s.phone)}
             <button class="btn btn-sm btn-outline-danger" title="Delete" onclick="Students.remove('${s.id}')"><i class="fas fa-trash"></i></button>
           </div>
         </td>
@@ -251,7 +252,7 @@ const Students = {
             <div class="col-6"><strong>Gender:</strong> ${s.gender}</div>
             <div class="col-6"><strong>Class:</strong> ${s.className} - ${s.section}</div>
             <div class="col-6"><strong>Roll No:</strong> ${s.rollNo || '-'}</div>
-            <div class="col-6"><strong>Phone:</strong> ${s.phone || '-'}</div>
+            <div class="col-6"><strong>Phone:</strong> ${s.phone || '-'} ${s.phone ? Utils.whatsAppButton(s.phone) : ''}</div>
             <div class="col-6"><strong>Blood Group:</strong> ${s.bloodGroup || '-'}</div>
             <div class="col-12"><strong>Address:</strong> ${s.address || '-'}, ${s.city || ''}</div>
             <div class="col-6"><strong>Admission:</strong> ${Utils.formatDate(s.admissionDate)}</div>
