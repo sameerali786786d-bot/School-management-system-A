@@ -27,11 +27,7 @@
     .login-header h1 { font-size: 1.15rem; font-weight: 700; margin: 0 0 4px; }
     .login-header p { margin: 0; opacity: .85; font-size: .85rem; }
     .login-body { padding: 24px; }
-    .demo-accounts {
-      background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px;
-      padding: 12px; margin-top: 16px; font-size: .8rem;
-    }
-    .demo-accounts code { background: #e2e8f0; padding: 1px 6px; border-radius: 4px; color: #be185d; }
+
     .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
     .btn-primary { background: #1e40af; border-color: #1e40af; }
     .btn-primary:hover { background: #1e3a8a; border-color: #1e3a8a; }
@@ -57,9 +53,6 @@
         <p>Qamber • School Management System</p>
       </div>
       <div class="login-body">
-        <div class="alert alert-warning py-2 small mb-3" role="alert">
-          <i class="fas fa-info-circle me-1"></i> <strong>DEMO MODE</strong> — LocalStorage authentication only. Not for production use.
-        </div>
         <div id="loginError" class="alert alert-danger py-2 small d-none" role="alert"></div>
         <div id="loginSuccess" class="alert alert-success py-2 small d-none" role="alert"></div>
 
@@ -243,7 +236,7 @@
 
       document.getElementById('forgotPassword').addEventListener('click', function (e) {
         e.preventDefault();
-        alert('Please contact admin for login help.\nWhatsApp: 0326-7029939');
+        window.open('https://wa.me/923267029939?text=Login%20help%20chahiye', '_blank');
       });
 
       document.getElementById('loginForm').addEventListener('submit', function (e) {
