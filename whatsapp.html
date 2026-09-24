@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Sheet - THE SMART MODERN PUBLIC SCHOOL QAMBER</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+  <link href="css/responsive.css" rel="stylesheet">
+</head>
+<body>
+  <div class="app-wrapper">
+    <div class="main-content">
+      <div class="page-content">
+        <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+          <div>
+            <h1 id="pageTitle">WhatsApp Sheet</h1>
+            <p class="text-muted mb-0 small">Contact students, teachers, parents & staff on WhatsApp</p>
+          </div>
+          <a href="https://wa.me/923267029939" target="_blank" rel="noopener" class="btn btn-success btn-sm">
+            <i class="fab fa-whatsapp me-1"></i> Admin: 0326-7029939
+          </a>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-body py-2">
+            <div class="row g-2 align-items-center">
+              <div class="col-md-4">
+                <input type="search" id="waSearch" class="form-control form-control-sm" placeholder="Search name or phone...">
+              </div>
+              <div class="col-md-3">
+                <select id="waClassFilter" class="form-select form-select-sm">
+                  <option value="">All Classes</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <select id="waHasPhone" class="form-select form-select-sm">
+                  <option value="">All contacts</option>
+                  <option value="yes">With phone only</option>
+                  <option value="no">Without phone</option>
+                </select>
+              </div>
+              <div class="col-md-2 text-md-end">
+                <span class="badge bg-success" id="waCount">0</span> contacts
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ul class="nav nav-tabs mb-3" role="tablist">
+          <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabStudents" type="button"><i class="fas fa-user-graduate me-1"></i>Students</button></li>
+          <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabTeachers" type="button"><i class="fas fa-chalkboard-teacher me-1"></i>Teachers</button></li>
+          <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabParents" type="button"><i class="fas fa-users me-1"></i>Parents</button></li>
+          <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabStaff" type="button"><i class="fas fa-user-tie me-1"></i>Staff</button></li>
+        </ul>
+
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="tabStudents">
+            <div class="card"><div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr><th>#</th><th>Name</th><th>Class</th><th>Phone</th><th>Parent Phone</th><th>WhatsApp</th></tr>
+                  </thead>
+                  <tbody id="studentsBody"></tbody>
+                </table>
+              </div>
+            </div></div>
+          </div>
+          <div class="tab-pane fade" id="tabTeachers">
+            <div class="card"><div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr><th>#</th><th>Name</th><th>Subject</th><th>Phone</th><th>WhatsApp</th></tr>
+                  </thead>
+                  <tbody id="teachersBody"></tbody>
+                </table>
+              </div>
+            </div></div>
+          </div>
+          <div class="tab-pane fade" id="tabParents">
+            <div class="card"><div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr><th>#</th><th>Parent Name</th><th>Student</th><th>Phone</th><th>WhatsApp</th></tr>
+                  </thead>
+                  <tbody id="parentsBody"></tbody>
+                </table>
+              </div>
+            </div></div>
+          </div>
+          <div class="tab-pane fade" id="tabStaff">
+            <div class="card"><div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr><th>#</th><th>Name</th><th>Role</th><th>Phone</th><th>WhatsApp</th></tr>
+                  </thead>
+                  <tbody id="staffBody"></tbody>
+                </table>
+              </div>
+            </div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/demo-data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/whatsapp.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      App.init();
+      App.ensureConfirmModal();
+      if (typeof PageModule !== 'undefined') PageModule.init();
+    });
+  </script>
+</body>
+</html>
