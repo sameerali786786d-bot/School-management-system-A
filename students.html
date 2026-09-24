@@ -10,6 +10,44 @@
   <link href="css/style.css" rel="stylesheet">
   <link href="css/responsive.css" rel="stylesheet">
   <link href="css/print.css" rel="stylesheet">
+  <style>
+    .id-card {
+      width: 320px; border-radius: 12px; overflow: hidden;
+      border: 1px solid #cbd5e1; background: #fff;
+      font-family: Inter, system-ui, sans-serif;
+      box-shadow: 0 4px 16px rgba(0,0,0,.08);
+    }
+    .id-card-header {
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      color: #fff; padding: 10px 12px; text-align: center;
+    }
+    .id-card-header img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: #fff; }
+    .id-card-body { padding: 12px; display: flex; gap: 12px; }
+    .id-photo {
+      width: 88px; height: 110px; border-radius: 8px; overflow: hidden;
+      background: #e2e8f0; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: 700; color: #1e40af;
+    }
+    .id-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .id-info { flex: 1; font-size: 0.78rem; line-height: 1.45; }
+    .id-info .name { font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+    .id-info div span { color: #64748b; }
+    .id-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; border-top: 1px solid #e2e8f0; background: #f8fafc;
+    }
+    .id-card-footer canvas, .id-card-footer img { width: 72px; height: 72px; }
+    .id-card-footer .scan-text { font-size: 0.65rem; color: #64748b; max-width: 160px; }
+    @media print {
+      body * { visibility: hidden !important; }
+      #idCardModal, #idCardModal * { visibility: visible !important; }
+      #idCardModal { position: fixed; left: 0; top: 0; margin: 0; padding: 0; }
+      .modal-backdrop, .no-print { display: none !important; }
+      .modal { position: static !important; }
+      .modal-dialog { max-width: none !important; margin: 0 !important; }
+      .modal-content { border: none !important; box-shadow: none !important; }
+    }
+  </style>
 </head>
 <body>
   <div class="app-wrapper">
@@ -178,6 +216,14 @@
                 <label class="form-label">Emergency Contact</label>
                 <input type="tel" class="form-control" id="emergencyContact">
               </div>
+              <div class="col-12">
+                <label class="form-label">Student Photo (for ID Card)</label>
+                <input type="file" class="form-control" id="studentPhoto" accept="image/*">
+                <div class="mt-2 d-flex align-items-center gap-2">
+                  <img id="studentPhotoPreview" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px;display:none;border:1px solid #e2e8f0;">
+                  <button type="button" class="btn btn-sm btn-outline-danger" id="clearStudentPhoto" style="display:none;">Remove Photo</button>
+                </div>
+              </div>
             </div>
           </div>
           <div class="modal-footer">
@@ -185,6 +231,24 @@
             <button type="submit" class="btn btn-primary" id="saveStudentBtn">Save Student</button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ID Card Modal -->
+  <div class="modal fade" id="idCardModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header no-print">
+          <h5 class="modal-title">Student ID Card</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body d-flex justify-content-center" id="idCardBody"></div>
+        <div class="modal-footer no-print">
+          <button type="button" class="btn btn-outline-primary" id="printIdCard"><i class="fas fa-print me-1"></i>Print</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
       </div>
     </div>
   </div>
@@ -199,6 +263,7 @@
         </div>
         <div class="modal-body" id="viewStudentBody"></div>
         <div class="modal-footer no-print">
+          <button type="button" class="btn btn-dark" id="viewIdCardBtn"><i class="fas fa-id-card me-1"></i>ID Card</button>
           <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print me-1"></i>Print</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
@@ -206,6 +271,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/utils.js"></script>
