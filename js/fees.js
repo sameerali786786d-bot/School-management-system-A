@@ -101,7 +101,7 @@ const Fees = {
     const settings = Storage.get('settings') || {};
     document.getElementById('receiptBody').innerHTML = `
       <div class="text-center mb-3">
-        <h5 class="mb-0">${settings.schoolName || 'THE SMART MODERN PUBLIC SCHOOL QAMBER'}</h5>
+        <h5 class="mb-0">${settings.schoolName || 'Al Bilawal Soomro Public School'}</h5>
         <small class="text-muted">${settings.address || ''}</small>
         <h6 class="mt-2">FEE RECEIPT</h6>
       </div>

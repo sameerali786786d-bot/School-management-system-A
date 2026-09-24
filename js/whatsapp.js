@@ -53,7 +53,7 @@ const PageModule = {
     if (!link) {
       return '<span class="text-muted small">No number</span>';
     }
-    const msg = encodeURIComponent('Assalamualaikum ' + (name || '') + ', THE SMART MODERN PUBLIC SCHOOL QAMBER');
+    const msg = encodeURIComponent('Assalamualaikum ' + (name || '') + ', Al Bilawal Soomro Public School');
     return `<a href="${link}?text=${msg}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-success"><i class="fab fa-whatsapp me-1"></i>Chat</a>`;
   },
 

@@ -1,5 +1,5 @@
 /**
- * Demo Data Seeder - Realistic sample data for THE SMART MODERN PUBLIC SCHOOL QAMBER
+ * Demo Data Seeder - Realistic sample data for Al Bilawal Soomro Public School
  * DEMO ONLY
  */
 
@@ -9,8 +9,8 @@ const DemoData = {
 
     // Settings
     Storage.set('settings', {
-      schoolName: 'THE SMART MODERN PUBLIC SCHOOL QAMBER',
-      shortName: 'SMPS Qamber',
+      schoolName: 'Al Bilawal Soomro Public School',
+      shortName: 'Al Bilawal Soomro',
       address: 'Main Road, Qamber Ali Khan, Sindh, Pakistan',
       phone: '+92-74-XXXXXXX',
       email: 'info@smartschoolqamber.edu.pk',
@@ -369,7 +369,7 @@ const DemoData = {
 
     Auth.init();
     Storage.markInitialized();
-    console.log('Demo data seeded successfully for THE SMART MODERN PUBLIC SCHOOL QAMBER');
+    console.log('Demo data seeded successfully for Al Bilawal Soomro Public School');
   }
 };
 
