@@ -46,6 +46,25 @@ const PageModule = {
         <div class="tab-pane fade show active" id="tabSchool">
           <form id="settingsForm" class="row g-3">
             <div class="col-12"><h6 class="text-primary">School Profile</h6></div>
+            <div class="col-12">
+              <h6 class="text-primary">School Logo</h6>
+              <div class="d-flex flex-wrap align-items-center gap-3 mb-2">
+                <div class="logo-preview-wrap" id="logoPreviewWrap">
+                  <img id="logoPreview" alt="Logo" style="display:none;">
+                  <span id="logoPlaceholder" class="text-muted small">No logo</span>
+                </div>
+                <div class="flex-grow-1" style="min-width:200px;">
+                  <input type="file" id="logoFileInput" accept="image/*" class="form-control form-control-sm mb-2">
+                  <div class="d-flex gap-2 flex-wrap">
+                    <button type="button" class="btn btn-sm btn-primary" id="logoSaveBtn"><i class="fas fa-save me-1"></i>Save Logo</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" id="logoRemoveBtn"><i class="fas fa-trash me-1"></i>Remove Logo</button>
+                  </div>
+                  <p class="text-muted small mb-0 mt-1">PNG/JPG, max ~1MB. Sidebar + login page update hogi.</p>
+                </div>
+              </div>
+              <hr>
+            </div>
+
             <div class="col-md-6"><label class="form-label">School Name</label><input class="form-control" id="schoolName" value="${this.esc(s.schoolName)}"></div>
             <div class="col-md-6"><label class="form-label">Principal Name</label><input class="form-control" id="principalName" value="${this.esc(s.principalName)}"></div>
             <div class="col-md-6"><label class="form-label">Address</label><input class="form-control" id="address" value="${this.esc(s.address)}"></div>
@@ -194,6 +213,10 @@ const PageModule = {
       setTimeout(() => location.reload(), 500);
     });
 
+    
+    // School logo controls
+    this.initLogoControls();
+
     if (isAdmin) {
       this.renderUsers();
       document.getElementById('btnAddUser')?.addEventListener('click', () => this.openUserModal());
@@ -308,6 +331,83 @@ const PageModule = {
     this.renderUsers();
   },
 
+
+  initLogoControls() {
+    const preview = document.getElementById('logoPreview');
+    const placeholder = document.getElementById('logoPlaceholder');
+    const input = document.getElementById('logoFileInput');
+    if (!preview || !input) return;
+
+    const showLogo = (src) => {
+      if (src) {
+        preview.src = src;
+        preview.style.display = 'block';
+        if (placeholder) placeholder.style.display = 'none';
+      } else {
+        preview.removeAttribute('src');
+        preview.style.display = 'none';
+        if (placeholder) placeholder.style.display = 'inline';
+      }
+    };
+
+    let current = '';
+    try {
+      current = localStorage.getItem('smps_schoolLogo');
+      if (current === '') current = '';
+      else if (!current) current = 'assets/images/logo.jpg';
+    } catch (e) {}
+    showLogo(current || '');
+    if (current) preview.dataset.pending = current;
+
+    input.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        Toast.show('Please select an image', 'warning');
+        return;
+      }
+      if (file.size > 1.5 * 1024 * 1024) {
+        Toast.show('Image should be under 1.5MB', 'warning');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        preview.dataset.pending = reader.result;
+        showLogo(reader.result);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('logoSaveBtn')?.addEventListener('click', () => {
+      const data = preview.dataset.pending;
+      if (!data) {
+        Toast.show('Select a logo first', 'warning');
+        return;
+      }
+      try {
+        localStorage.setItem('smps_schoolLogo', data);
+        Toast.show('School logo saved', 'success');
+        // refresh sidebar logo
+        const img = document.querySelector('.sidebar-brand .brand-icon img');
+        if (img) img.src = data;
+        else {
+          const icon = document.querySelector('.sidebar-brand .brand-icon');
+          if (icon) icon.innerHTML = '<img src="' + data + '" alt="School Logo" class="brand-logo-img">';
+        }
+      } catch (err) {
+        Toast.show('Save failed — try smaller image', 'error');
+      }
+    });
+
+    document.getElementById('logoRemoveBtn')?.addEventListener('click', () => {
+      localStorage.setItem('smps_schoolLogo', '');
+      preview.dataset.pending = '';
+      showLogo('');
+      const icon = document.querySelector('.sidebar-brand .brand-icon');
+      if (icon) icon.innerHTML = '<span style="font-weight:700;font-size:.85rem;">AB</span>';
+      Toast.show('Logo removed', 'success');
+    });
+  },
   formatDateTime(iso) {
     if (!iso) return '-';
     try {
