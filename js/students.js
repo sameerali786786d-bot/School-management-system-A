@@ -49,6 +49,14 @@ const Students = {
     });
     document.getElementById('classId')?.addEventListener('change', e => this.updateSections(e.target.value));
     document.getElementById('studentForm')?.addEventListener('submit', e => this.save(e));
+    document.getElementById('studentPhoto')?.addEventListener('change', e => this.onPhotoChange(e));
+    document.getElementById('clearStudentPhoto')?.addEventListener('click', () => {
+      this._pendingPhoto = null;
+      this.updatePhotoPreview(null);
+      const inp = document.getElementById('studentPhoto');
+      if (inp) inp.value = '';
+    });
+    document.getElementById('printIdCard')?.addEventListener('click', () => window.print());
   },
 
   getFiltered() {
@@ -100,6 +108,7 @@ const Students = {
         <td class="no-print">
           <div class="action-btns">
             <button class="btn btn-sm btn-outline-info" title="View" onclick="Students.view('${s.id}')"><i class="fas fa-eye"></i></button>
+            <button class="btn btn-sm btn-outline-dark" title="ID Card" onclick="Students.showIdCard('${s.id}')"><i class="fas fa-id-card"></i></button>
             <button class="btn btn-sm btn-outline-primary" title="Edit" onclick="Students.openModal('${s.id}')"><i class="fas fa-edit"></i></button>
             ${Utils.whatsAppButton(s.phone)}
             <button class="btn btn-sm btn-outline-danger" title="Delete" onclick="Students.remove('${s.id}')"><i class="fas fa-trash"></i></button>
@@ -169,6 +178,11 @@ const Students = {
       document.getElementById('status').value = s.status || 'active';
       document.getElementById('previousSchool').value = s.previousSchool || '';
       document.getElementById('emergencyContact').value = s.emergencyContact || '';
+      this._pendingPhoto = s.photo || null;
+      this.updatePhotoPreview(s.photo || null);
+    } else {
+      this._pendingPhoto = null;
+      this.updatePhotoPreview(null);
     }
     new bootstrap.Modal(document.getElementById('studentModal')).show();
   },
@@ -202,7 +216,8 @@ const Students = {
       admissionDate: document.getElementById('admissionDate').value,
       status: document.getElementById('status').value,
       previousSchool: document.getElementById('previousSchool').value.trim(),
-      emergencyContact: document.getElementById('emergencyContact').value.trim()
+      emergencyContact: document.getElementById('emergencyContact').value.trim(),
+      photo: this._pendingPhoto || null
     };
 
     if (id) {
@@ -239,7 +254,7 @@ const Students = {
     document.getElementById('viewStudentBody').innerHTML = `
       <div class="row">
         <div class="col-md-3 text-center mb-3">
-          <div class="user-avatar mx-auto" style="width:80px;height:80px;font-size:1.8rem;">${s.fullName.charAt(0)}</div>
+          ${s.photo ? `<img src="${s.photo}" class="rounded-circle mx-auto d-block" style="width:80px;height:80px;object-fit:cover;">` : `<div class="user-avatar mx-auto" style="width:80px;height:80px;font-size:1.8rem;">${s.fullName.charAt(0)}</div>`}
           <h5 class="mt-2 mb-0">${s.fullName}</h5>
           <code>${s.admissionNo}</code>
           <div class="mt-1">${Utils.getStatusBadge(s.status)}</div>
@@ -282,9 +297,142 @@ const Students = {
           </div>
         </div>
       </div>`;
+    const idBtn = document.getElementById('viewIdCardBtn');
+    if (idBtn) idBtn.onclick = () => { bootstrap.Modal.getInstance(document.getElementById('viewStudentModal'))?.hide(); this.showIdCard(id); };
     new bootstrap.Modal(document.getElementById('viewStudentModal')).show();
   },
 
+
+  onPhotoChange(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      Toast.show('Select an image file', 'warning');
+      return;
+    }
+    if (file.size > 800 * 1024) {
+      Toast.show('Photo should be under 800KB', 'warning');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      this._pendingPhoto = reader.result;
+      this.updatePhotoPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  },
+
+  updatePhotoPreview(src) {
+    const img = document.getElementById('studentPhotoPreview');
+    const btn = document.getElementById('clearStudentPhoto');
+    if (!img) return;
+    if (src) {
+      img.src = src;
+      img.style.display = 'block';
+      if (btn) btn.style.display = 'inline-block';
+    } else {
+      img.removeAttribute('src');
+      img.style.display = 'none';
+      if (btn) btn.style.display = 'none';
+    }
+  },
+
+  getClassName(s) {
+    if (s.className) return s.className;
+    const c = Storage.getById('classes', s.classId);
+    return c ? c.name : '-';
+  },
+
+  buildCardPayload(s) {
+    return {
+      n: s.fullName,
+      a: s.admissionNo,
+      cl: this.getClassName(s),
+      sec: s.section,
+      r: s.rollNo,
+      g: s.gender,
+      dob: s.dob,
+      bg: s.bloodGroup,
+      ph: s.phone,
+      f: s.fatherName,
+      m: s.motherName,
+      ad: s.address,
+      st: s.status
+    };
+  },
+
+  encodePayload(obj) {
+    try {
+      const json = JSON.stringify(obj);
+      const b64 = btoa(unescape(encodeURIComponent(json)));
+      return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    } catch (e) {
+      return '';
+    }
+  },
+
+  async showIdCard(id) {
+    const s = Storage.getById('students', id);
+    if (!s) {
+      Toast.show('Student not found', 'error');
+      return;
+    }
+    const logo = (typeof App !== 'undefined' && App.getSchoolLogo) ? App.getSchoolLogo() : 'assets/images/logo.jpg';
+    const photoHtml = s.photo
+      ? '<img src="' + s.photo + '" alt="Photo">'
+      : '<span>' + (s.fullName || 'S').charAt(0) + '</span>';
+    const payload = this.buildCardPayload(s);
+    const enc = this.encodePayload(payload);
+    const base = location.href.replace(/[^/]*$/, 'student-card.html');
+    const url = base + '?id=' + encodeURIComponent(s.id) + (enc ? '&d=' + enc : '');
+
+    const body = document.getElementById('idCardBody');
+    body.innerHTML = '<div class="id-card" id="printableIdCard">' +
+      '<div class="id-card-header">' +
+        '<img src="' + logo + '" alt="Logo" onerror="this.style.display=\'none\'">' +
+        '<div class="fw-semibold" style="font-size:.8rem;">Al Bilawal Soomro Public School</div>' +
+        '<div style="font-size:.65rem;opacity:.9;">STUDENT IDENTITY CARD</div>' +
+      '</div>' +
+      '<div class="id-card-body">' +
+        '<div class="id-photo">' + photoHtml + '</div>' +
+        '<div class="id-info">' +
+          '<div class="name">' + (s.fullName || '-') + '</div>' +
+          '<div><span>Adm:</span> ' + (s.admissionNo || '-') + '</div>' +
+          '<div><span>Class:</span> ' + this.getClassName(s) + (s.section ? ' (' + s.section + ')' : '') + '</div>' +
+          '<div><span>Roll:</span> ' + (s.rollNo || '-') + '</div>' +
+          '<div><span>DOB:</span> ' + (s.dob || '-') + '</div>' +
+          '<div><span>Blood:</span> ' + (s.bloodGroup || '-') + '</div>' +
+          '<div><span>Father:</span> ' + (s.fatherName || '-') + '</div>' +
+          '<div><span>Phone:</span> ' + (s.phone || '-') + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="id-card-footer">' +
+        '<div class="scan-text"><i class="fas fa-qrcode me-1"></i>Scan QR for full student details</div>' +
+        '<canvas id="idQrCanvas"></canvas>' +
+      '</div>' +
+    '</div>';
+
+    new bootstrap.Modal(document.getElementById('idCardModal')).show();
+
+    const canvas = document.getElementById('idQrCanvas');
+    if (typeof QRCode !== 'undefined' && canvas) {
+      try {
+        await QRCode.toCanvas(canvas, url, { width: 72, margin: 1, color: { dark: '#0f172a', light: '#ffffff' } });
+      } catch (err) {
+        console.error(err);
+        const img = document.createElement('img');
+        img.width = 72; img.height = 72;
+        img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=72x72&data=' + encodeURIComponent(url);
+        canvas.replaceWith(img);
+      }
+    } else if (canvas) {
+      const img = document.createElement('img');
+      img.width = 72; img.height = 72;
+      img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=72x72&data=' + encodeURIComponent(url);
+      canvas.replaceWith(img);
+    }
+  }
+,
   exportData() {
     const data = this.getFiltered().map(s => ({
       AdmissionNo: s.admissionNo,
