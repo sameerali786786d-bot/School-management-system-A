@@ -1,4 +1,4 @@
-# THE SMART MODERN PUBLIC SCHOOL QAMBER
+# Al Bilawal Soomro Public School
 ## School Management System (Demo)
 
 A complete, modern, professional School Management System web application built with pure HTML5, CSS3, Vanilla JavaScript, Bootstrap 5, Chart.js and LocalStorage.
@@ -185,11 +185,11 @@ Requires LocalStorage and ES6 support.
 
 ## License
 
-Built as a demonstration project for THE SMART MODERN PUBLIC SCHOOL QAMBER.  
+Built as a demonstration project for Al Bilawal Soomro Public School.  
 Free to use and adapt for educational purposes.
 
 ---
 
-**School:** THE SMART MODERN PUBLIC SCHOOL QAMBER  
+**School:** Al Bilawal Soomro Public School  
 **Location:** Qamber Ali Khan, Sindh, Pakistan  
 **Academic Session (demo):** 2025-2026
