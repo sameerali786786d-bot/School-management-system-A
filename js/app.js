@@ -93,6 +93,9 @@ const App = {
         <a href="notices.html" class="nav-link" data-page="notices" data-perm="notices">
           <i class="fas fa-bullhorn"></i><span class="nav-text">Notices</span>
         </a>
+        <a href="whatsapp.html" class="nav-link" data-page="whatsapp" data-perm="students">
+          <i class="fab fa-whatsapp"></i><span class="nav-text">WhatsApp Sheet</span>
+        </a>
         <a href="reports.html" class="nav-link" data-page="reports" data-perm="reports">
           <i class="fas fa-chart-bar"></i><span class="nav-text">Reports</span>
         </a>
