@@ -11,41 +11,110 @@
   <link href="css/responsive.css" rel="stylesheet">
   <link href="css/print.css" rel="stylesheet">
   <style>
-    .id-card {
-      width: 320px; border-radius: 12px; overflow: hidden;
-      border: 1px solid #cbd5e1; background: #fff;
+    .id-card-set { display: flex; flex-wrap: wrap; gap: 1.25rem; justify-content: center; }
+    .id-card-pro {
+      width: 300px;
+      height: 480px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 8px 28px rgba(0,0,0,.12);
       font-family: Inter, system-ui, sans-serif;
-      box-shadow: 0 4px 16px rgba(0,0,0,.08);
+      position: relative;
+      display: flex;
+      flex-direction: column;
     }
-    .id-card-header {
-      background: linear-gradient(135deg, #1e3a8a, #2563eb);
-      color: #fff; padding: 10px 12px; text-align: center;
+    .id-pro-top {
+      background: #2d3436;
+      height: 42%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 18px;
+      color: #fff;
     }
-    .id-card-header img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: #fff; }
-    .id-card-body { padding: 12px; display: flex; gap: 12px; }
-    .id-photo {
-      width: 88px; height: 110px; border-radius: 8px; overflow: hidden;
-      background: #e2e8f0; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-      font-size: 2rem; font-weight: 700; color: #1e40af;
+    .id-pro-top.back-top { justify-content: center; padding-top: 0; }
+    .id-pro-wave {
+      position: absolute;
+      left: 0; right: 0; bottom: -1px;
+      height: 70px;
+      background: #00b4b4;
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      transform: scaleX(1.15);
     }
-    .id-photo img { width: 100%; height: 100%; object-fit: cover; }
-    .id-info { flex: 1; font-size: 0.78rem; line-height: 1.45; }
-    .id-info .name { font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
-    .id-info div span { color: #64748b; }
-    .id-card-footer {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 8px 12px; border-top: 1px solid #e2e8f0; background: #f8fafc;
+    .id-pro-wave::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; bottom: 18px;
+      height: 50px;
+      background: #fff;
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      transform: scaleX(1.05);
     }
-    .id-card-footer canvas, .id-card-footer img { width: 72px; height: 72px; }
-    .id-card-footer .scan-text { font-size: 0.65rem; color: #64748b; max-width: 160px; }
+    .id-pro-photo {
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      border: 4px solid #00b4b4;
+      overflow: hidden;
+      background: #dfe6e9;
+      z-index: 2;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem; font-weight: 700; color: #2d3436;
+    }
+    .id-pro-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .id-pro-name {
+      z-index: 2; margin-top: 10px; font-weight: 700; font-size: 1.05rem;
+      letter-spacing: .02em; text-transform: uppercase; text-align: center; padding: 0 12px;
+    }
+    .id-pro-role {
+      z-index: 2; font-size: .75rem; color: #b2bec3; margin-top: 2px;
+    }
+    .id-pro-body {
+      flex: 1; padding: 28px 22px 16px; background: #fff; position: relative;
+    }
+    .id-pro-row {
+      display: flex; font-size: .78rem; margin-bottom: 7px; color: #2d3436;
+    }
+    .id-pro-row .k { width: 72px; color: #636e72; flex-shrink: 0; }
+    .id-pro-row .k::after { content: ' :'; }
+    .id-pro-row .v { font-weight: 600; }
+    .id-pro-row.accent .v { color: #00b4b4; }
+    .id-pro-logo-wrap { text-align: center; z-index: 2; }
+    .id-pro-logo-wrap img {
+      width: 64px; height: 64px; border-radius: 12px; object-fit: cover; background: #fff;
+    }
+    .id-pro-logo-wrap .school-name {
+      font-weight: 700; font-size: .9rem; margin-top: 8px; color: #fff;
+    }
+    .id-pro-logo-wrap .slogan {
+      font-size: .65rem; color: #b2bec3; letter-spacing: .04em;
+    }
+    .id-pro-back-body { padding: 32px 20px 12px; flex: 1; background: #fff; }
+    .id-pro-back-body p {
+      font-size: .68rem; color: #636e72; line-height: 1.4; margin-bottom: 14px;
+    }
+    .id-pro-qr {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin-top: 8px; padding-top: 8px; border-top: 1px dashed #dfe6e9;
+    }
+    .id-pro-qr canvas, .id-pro-qr img { width: 80px !important; height: 80px !important; }
+    .id-pro-qr .hint { font-size: .65rem; color: #636e72; max-width: 120px; }
+    .id-side-label {
+      position: absolute; top: 8px; right: 10px; font-size: .6rem;
+      background: rgba(255,255,255,.15); color: #fff; padding: 2px 8px; border-radius: 10px;
+      z-index: 3;
+    }
     @media print {
       body * { visibility: hidden !important; }
       #idCardModal, #idCardModal * { visibility: visible !important; }
-      #idCardModal { position: fixed; left: 0; top: 0; margin: 0; padding: 0; }
+      #idCardModal { position: fixed; left: 0; top: 0; margin: 0; }
       .modal-backdrop, .no-print { display: none !important; }
       .modal { position: static !important; }
       .modal-dialog { max-width: none !important; margin: 0 !important; }
       .modal-content { border: none !important; box-shadow: none !important; }
+      .id-card-pro { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
     }
   </style>
 </head>
@@ -238,7 +307,7 @@
 
   <!-- ID Card Modal -->
   <div class="modal fade" id="idCardModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header no-print">
           <h5 class="modal-title">Student ID Card</h5>
