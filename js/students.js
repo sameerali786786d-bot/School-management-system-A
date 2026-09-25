@@ -220,17 +220,47 @@ const Students = {
       photo: this._pendingPhoto || null
     };
 
+    // Keep existing photo if user did not change it
+    if (id && !this._pendingPhoto) {
+      const existing = Storage.getById('students', id);
+      if (existing && existing.photo) data.photo = existing.photo;
+    }
+
+    let ok = true;
     if (id) {
-      Storage.update('students', id, data);
-      Toast.show('Student updated successfully', 'success');
+      const updated = Storage.update('students', id, data);
+      ok = !!updated;
+      if (ok && data.photo) {
+        const check = Storage.getById('students', id);
+        if (!check || !check.photo) ok = false;
+      }
+      if (ok) Toast.show(data.photo ? 'Student + photo saved' : 'Student updated', 'success');
+      else Toast.show('Save failed — photo too large for browser storage. Use smaller photo.', 'error');
     } else {
       data.admissionNo = Utils.generateAdmissionNo();
       data.createdAt = new Date().toISOString();
-      Storage.add('students', data);
-      Toast.show('Student added successfully', 'success');
+      try {
+        Storage.add('students', data);
+        if (data.photo) {
+          const list = Storage.getAll('students');
+          const last = list.find(x => x.admissionNo === data.admissionNo);
+          if (!last || !last.photo) {
+            Toast.show('Saved but photo not stored — use smaller photo', 'warning');
+          } else {
+            Toast.show('Student + photo saved', 'success');
+          }
+        } else {
+          Toast.show('Student added successfully', 'success');
+        }
+      } catch (err) {
+        Toast.show('Save failed', 'error');
+        ok = false;
+      }
     }
-    bootstrap.Modal.getInstance(document.getElementById('studentModal')).hide();
-    this.render();
+    if (ok) {
+      bootstrap.Modal.getInstance(document.getElementById('studentModal')).hide();
+      this.render();
+    }
   },
 
   async remove(id) {
@@ -310,16 +340,46 @@ const Students = {
       Toast.show('Select an image file', 'warning');
       return;
     }
-    if (file.size > 800 * 1024) {
-      Toast.show('Photo should be under 800KB', 'warning');
+    if (file.size > 5 * 1024 * 1024) {
+      Toast.show('Photo too large (max 5MB)', 'warning');
       return;
     }
     const reader = new FileReader();
     reader.onload = () => {
-      this._pendingPhoto = reader.result;
-      this.updatePhotoPreview(reader.result);
+      this.compressPhoto(reader.result, (dataUrl) => {
+        this._pendingPhoto = dataUrl;
+        this.updatePhotoPreview(dataUrl);
+        Toast.show('Photo ready — Save Student dabayein', 'success');
+      });
     };
+    reader.onerror = () => Toast.show('Photo read failed', 'error');
     reader.readAsDataURL(file);
+  },
+
+  compressPhoto(dataUrl, callback) {
+    const img = new Image();
+    img.onload = () => {
+      const max = 400;
+      let w = img.width, h = img.height;
+      if (w > max || h > max) {
+        if (w > h) { h = Math.round(h * max / w); w = max; }
+        else { w = Math.round(w * max / h); h = max; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      let out = canvas.toDataURL('image/jpeg', 0.75);
+      // if still huge, lower quality
+      if (out.length > 120000) out = canvas.toDataURL('image/jpeg', 0.55);
+      callback(out);
+    };
+    img.onerror = () => {
+      Toast.show('Invalid image', 'error');
+      callback(null);
+    };
+    img.src = dataUrl;
   },
 
   updatePhotoPreview(src) {
@@ -373,15 +433,22 @@ const Students = {
   },
 
   async showIdCard(id) {
-    const s = Storage.getById('students', id);
+    let s = Storage.getById('students', id);
     if (!s) {
       Toast.show('Student not found', 'error');
       return;
     }
+    // re-read to ensure latest photo
+    const all = Storage.getAll('students') || [];
+    s = all.find(x => x.id === id) || s;
     const logo = (typeof App !== 'undefined' && App.getSchoolLogo) ? App.getSchoolLogo() : 'assets/images/logo.jpg';
-    const photoHtml = s.photo
+    const hasPhoto = !!(s.photo && String(s.photo).startsWith('data:image'));
+    const photoHtml = hasPhoto
       ? '<img src="' + s.photo + '" alt="Photo">'
       : '<span>' + (s.fullName || 'S').charAt(0).toUpperCase() + '</span>';
+    if (!hasPhoto) {
+      console.warn('ID card: no photo on student', id, s.photo ? 'invalid photo data' : 'missing');
+    }
     const payload = this.buildCardPayload(s);
     const enc = this.encodePayload(payload);
     const base = location.href.replace(/[^/]*$/, 'student-card.html');

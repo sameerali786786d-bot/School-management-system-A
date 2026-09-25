@@ -28,6 +28,11 @@ const Storage = {
       return true;
     } catch (e) {
       console.error('Storage set error:', key, e);
+      if (e && (e.name === 'QuotaExceededError' || e.code === 22)) {
+        if (typeof Toast !== 'undefined') {
+          Toast.show('Storage full — photo too large. Use smaller image.', 'error');
+        }
+      }
       return false;
     }
   },
@@ -62,7 +67,7 @@ const Storage = {
     const idx = items.findIndex(item => item.id === id);
     if (idx === -1) return null;
     items[idx] = { ...items[idx], ...updates, updatedAt: new Date().toISOString() };
-    this.saveAll(collection, items);
+    if (!this.saveAll(collection, items)) return null;
     return items[idx];
   },
 
