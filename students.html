@@ -11,110 +11,124 @@
   <link href="css/responsive.css" rel="stylesheet">
   <link href="css/print.css" rel="stylesheet">
   <style>
-    .id-card-set { display: flex; flex-wrap: wrap; gap: 1.25rem; justify-content: center; }
-    .id-card-pro {
-      width: 300px;
-      height: 480px;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #fff;
-      box-shadow: 0 8px 28px rgba(0,0,0,.12);
-      font-family: Inter, system-ui, sans-serif;
-      position: relative;
-      display: flex;
-      flex-direction: column;
+    .id-card-set { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center; padding: 8px; }
+    .sid-card {
+      width: 300px; height: 460px; border-radius: 12px; overflow: hidden;
+      background: #fff; box-shadow: 0 10px 30px rgba(15,23,42,.15);
+      font-family: Inter, system-ui, sans-serif; position: relative;
+      display: flex; flex-direction: column;
     }
-    .id-pro-top {
-      background: #2d3436;
-      height: 42%;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding-top: 18px;
-      color: #fff;
+    /* FRONT */
+    .sid-front-header {
+      background: #0b3a6e; color: #fff; text-align: center;
+      padding: 16px 14px 48px; position: relative;
     }
-    .id-pro-top.back-top { justify-content: center; padding-top: 0; }
-    .id-pro-wave {
-      position: absolute;
-      left: 0; right: 0; bottom: -1px;
-      height: 70px;
-      background: #00b4b4;
-      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-      transform: scaleX(1.15);
+    .sid-front-header .logo-row {
+      display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 6px;
     }
-    .id-pro-wave::after {
-      content: '';
-      position: absolute;
-      left: 0; right: 0; bottom: 18px;
-      height: 50px;
+    .sid-front-header .logo-row img {
+      width: 40px; height: 40px; border-radius: 8px; object-fit: cover; background: #fff;
+    }
+    .sid-front-header .school {
+      font-weight: 800; font-size: 0.95rem; color: #f97316; letter-spacing: .02em;
+      line-height: 1.2; text-transform: uppercase;
+    }
+    .sid-front-header .tagline {
+      font-size: 0.65rem; color: #93c5fd; letter-spacing: .08em;
+    }
+    .sid-wave-top {
+      position: absolute; left: 0; right: 0; bottom: -2px; height: 56px;
       background: #fff;
       border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-      transform: scaleX(1.05);
     }
-    .id-pro-photo {
-      width: 96px; height: 96px;
-      border-radius: 50%;
-      border: 4px solid #00b4b4;
-      overflow: hidden;
-      background: #dfe6e9;
-      z-index: 2;
+    .sid-wave-accent {
+      position: absolute; left: 0; right: 0; bottom: 20px; height: 28px;
+      background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      opacity: 0.9;
+    }
+    .sid-front-body {
+      flex: 1; background: #fff; text-align: center;
+      padding: 0 18px 12px; display: flex; flex-direction: column; align-items: center;
+    }
+    .sid-photo {
+      width: 110px; height: 110px; border-radius: 12px; overflow: hidden;
+      border: 3px solid #0b3a6e; margin-top: -8px; background: #e2e8f0;
       display: flex; align-items: center; justify-content: center;
-      font-size: 2.2rem; font-weight: 700; color: #2d3436;
+      font-size: 2.4rem; font-weight: 700; color: #0b3a6e;
+      box-shadow: 0 4px 12px rgba(11,58,110,.2);
     }
-    .id-pro-photo img { width: 100%; height: 100%; object-fit: cover; }
-    .id-pro-name {
-      z-index: 2; margin-top: 10px; font-weight: 700; font-size: 1.05rem;
-      letter-spacing: .02em; text-transform: uppercase; text-align: center; padding: 0 12px;
+    .sid-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .sid-name {
+      margin-top: 12px; font-weight: 800; font-size: 1.15rem; color: #0f172a;
+      text-transform: uppercase; letter-spacing: .03em;
     }
-    .id-pro-role {
-      z-index: 2; font-size: .75rem; color: #b2bec3; margin-top: 2px;
+    .sid-role {
+      font-size: 0.72rem; font-weight: 600; color: #64748b; letter-spacing: .12em;
+      margin-top: 2px; margin-bottom: 10px;
     }
-    .id-pro-body {
-      flex: 1; padding: 28px 22px 16px; background: #fff; position: relative;
+    .sid-details { width: 100%; text-align: left; font-size: 0.78rem; }
+    .sid-details div { margin-bottom: 4px; color: #334155; }
+    .sid-details strong { color: #0b3a6e; font-weight: 600; min-width: 52px; display: inline-block; }
+    .sid-front-footer {
+      height: 36px; background: #0b3a6e; position: relative;
     }
-    .id-pro-row {
-      display: flex; font-size: .78rem; margin-bottom: 7px; color: #2d3436;
+    .sid-front-footer::before {
+      content: ''; position: absolute; left: 0; right: 0; top: -18px; height: 28px;
+      background: #0b3a6e;
+      border-radius: 0 0 50% 50% / 0 0 100% 100%;
     }
-    .id-pro-row .k { width: 72px; color: #636e72; flex-shrink: 0; }
-    .id-pro-row .k::after { content: ' :'; }
-    .id-pro-row .v { font-weight: 600; }
-    .id-pro-row.accent .v { color: #00b4b4; }
-    .id-pro-logo-wrap { text-align: center; z-index: 2; }
-    .id-pro-logo-wrap img {
-      width: 64px; height: 64px; border-radius: 12px; object-fit: cover; background: #fff;
+    /* BACK */
+    .sid-back-top {
+      background: #0b3a6e; flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 24px 16px 60px;
+      position: relative; color: #fff;
     }
-    .id-pro-logo-wrap .school-name {
-      font-weight: 700; font-size: .9rem; margin-top: 8px; color: #fff;
+    .sid-qr-box {
+      background: #fff; padding: 10px; border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.2);
     }
-    .id-pro-logo-wrap .slogan {
-      font-size: .65rem; color: #b2bec3; letter-spacing: .04em;
+    .sid-qr-box canvas, .sid-qr-box img { display: block; width: 140px !important; height: 140px !important; }
+    .sid-back-label {
+      margin-top: 14px; font-weight: 700; letter-spacing: .15em; font-size: 0.8rem;
     }
-    .id-pro-back-body { padding: 32px 20px 12px; flex: 1; background: #fff; }
-    .id-pro-back-body p {
-      font-size: .68rem; color: #636e72; line-height: 1.4; margin-bottom: 14px;
+    .sid-wave-back {
+      position: absolute; left: 0; right: 0; bottom: -2px; height: 50px;
+      background: #fff;
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
     }
-    .id-pro-qr {
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      margin-top: 8px; padding-top: 8px; border-top: 1px dashed #dfe6e9;
+    .sid-wave-back-accent {
+      position: absolute; left: 0; right: 0; bottom: 16px; height: 24px;
+      background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
     }
-    .id-pro-qr canvas, .id-pro-qr img { width: 80px !important; height: 80px !important; }
-    .id-pro-qr .hint { font-size: .65rem; color: #636e72; max-width: 120px; }
-    .id-side-label {
-      position: absolute; top: 8px; right: 10px; font-size: .6rem;
-      background: rgba(255,255,255,.15); color: #fff; padding: 2px 8px; border-radius: 10px;
-      z-index: 3;
+    .sid-back-bottom {
+      background: #fff; padding: 20px 18px 16px; text-align: center;
+    }
+    .sid-back-bottom h6 {
+      font-size: 0.8rem; font-weight: 700; color: #0b3a6e; margin-bottom: 6px;
+    }
+    .sid-back-bottom p {
+      font-size: 0.65rem; color: #64748b; line-height: 1.4; margin-bottom: 8px;
+    }
+    .sid-badge {
+      display: inline-block; background: #0b3a6e; color: #fff;
+      font-size: 0.65rem; padding: 3px 10px; border-radius: 20px; margin-top: 4px;
+    }
+    .sid-label-tag {
+      position: absolute; top: 8px; left: 8px; z-index: 5;
+      background: rgba(255,255,255,.2); color: #fff; font-size: 0.6rem;
+      padding: 2px 8px; border-radius: 8px;
     }
     @media print {
       body * { visibility: hidden !important; }
       #idCardModal, #idCardModal * { visibility: visible !important; }
-      #idCardModal { position: fixed; left: 0; top: 0; margin: 0; }
+      #idCardModal { position: fixed; left: 0; top: 0; }
       .modal-backdrop, .no-print { display: none !important; }
       .modal { position: static !important; }
       .modal-dialog { max-width: none !important; margin: 0 !important; }
       .modal-content { border: none !important; box-shadow: none !important; }
-      .id-card-pro { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+      .sid-card { box-shadow: none; border: 1px solid #cbd5e1; page-break-inside: avoid; }
     }
   </style>
 </head>
