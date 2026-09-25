@@ -380,60 +380,92 @@ const Students = {
     const logo = (typeof App !== 'undefined' && App.getSchoolLogo) ? App.getSchoolLogo() : 'assets/images/logo.jpg';
     const photoHtml = s.photo
       ? '<img src="' + s.photo + '" alt="Photo">'
-      : '<span>' + (s.fullName || 'S').charAt(0) + '</span>';
+      : '<span>' + (s.fullName || 'S').charAt(0).toUpperCase() + '</span>';
     const payload = this.buildCardPayload(s);
     const enc = this.encodePayload(payload);
     const base = location.href.replace(/[^/]*$/, 'student-card.html');
     const url = base + '?id=' + encodeURIComponent(s.id) + (enc ? '&d=' + enc : '');
+    const cls = this.getClassName(s);
+    const role = (cls !== '-' ? cls : 'Student') + (s.section ? ' — ' + s.section : '');
+    const admit = s.admissionDate || '-';
+    // simple expire = admission + 1 year display or session end
+    let expire = '-';
+    try {
+      if (s.admissionDate) {
+        const d = new Date(s.admissionDate);
+        d.setFullYear(d.getFullYear() + 1);
+        expire = d.toISOString().slice(0, 10);
+      }
+    } catch (e) {}
 
     const body = document.getElementById('idCardBody');
-    body.innerHTML = '<div class="id-card" id="printableIdCard">' +
-      '<div class="id-card-header">' +
-        '<img src="' + logo + '" alt="Logo" onerror="this.style.display=\'none\'">' +
-        '<div class="fw-semibold" style="font-size:.8rem;">Al Bilawal Soomro Public School</div>' +
-        '<div style="font-size:.65rem;opacity:.9;">STUDENT IDENTITY CARD</div>' +
-      '</div>' +
-      '<div class="id-card-body">' +
-        '<div class="id-photo">' + photoHtml + '</div>' +
-        '<div class="id-info">' +
-          '<div class="name">' + (s.fullName || '-') + '</div>' +
-          '<div><span>Adm:</span> ' + (s.admissionNo || '-') + '</div>' +
-          '<div><span>Class:</span> ' + this.getClassName(s) + (s.section ? ' (' + s.section + ')' : '') + '</div>' +
-          '<div><span>Roll:</span> ' + (s.rollNo || '-') + '</div>' +
-          '<div><span>DOB:</span> ' + (s.dob || '-') + '</div>' +
-          '<div><span>Blood:</span> ' + (s.bloodGroup || '-') + '</div>' +
-          '<div><span>Father:</span> ' + (s.fatherName || '-') + '</div>' +
-          '<div><span>Phone:</span> ' + (s.phone || '-') + '</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="id-card-footer">' +
-        '<div class="scan-text"><i class="fas fa-qrcode me-1"></i>Scan QR for full student details</div>' +
-        '<canvas id="idQrCanvas"></canvas>' +
-      '</div>' +
-    '</div>';
+    body.innerHTML = `
+      <div class="id-card-set">
+        <!-- FRONT -->
+        <div class="id-card-pro" id="idCardFront">
+          <span class="id-side-label">FRONT</span>
+          <div class="id-pro-top">
+            <div class="id-pro-photo">${photoHtml}</div>
+            <div class="id-pro-name">${s.fullName || '-'}</div>
+            <div class="id-pro-role">${role}</div>
+            <div class="id-pro-wave"></div>
+          </div>
+          <div class="id-pro-body">
+            <div class="id-pro-row"><span class="k">ID</span><span class="v">${s.admissionNo || '-'}</span></div>
+            <div class="id-pro-row"><span class="k">DOB</span><span class="v">${s.dob || '-'}</span></div>
+            <div class="id-pro-row"><span class="k">Phone</span><span class="v">${s.phone || '-'}</span></div>
+            <div class="id-pro-row"><span class="k">E-mail</span><span class="v">${s.email || '-'}</span></div>
+            <div class="id-pro-row accent"><span class="k">Join</span><span class="v">${admit}</span></div>
+            <div class="id-pro-row accent"><span class="k">Expire</span><span class="v">${expire}</span></div>
+          </div>
+        </div>
+        <!-- BACK -->
+        <div class="id-card-pro" id="idCardBack">
+          <span class="id-side-label">BACK</span>
+          <div class="id-pro-top back-top">
+            <div class="id-pro-logo-wrap">
+              <img src="${logo}" alt="Logo" onerror="this.style.display='none'">
+              <div class="school-name">Al Bilawal Soomro Public School</div>
+              <div class="slogan">QUEST FOR EXCELLENCE</div>
+            </div>
+            <div class="id-pro-wave"></div>
+          </div>
+          <div class="id-pro-back-body">
+            <p>This card is property of Al Bilawal Soomro Public School. If found, please return to the school office. Unauthorized use is prohibited.</p>
+            <div class="id-pro-row"><span class="k">DOB</span><span class="v">${s.dob || '-'}</span></div>
+            <div class="id-pro-row"><span class="k">Phone</span><span class="v">${s.phone || '-'}</span></div>
+            <div class="id-pro-row"><span class="k">Blood</span><span class="v">${s.bloodGroup || '-'}</span></div>
+            <div class="id-pro-row"><span class="k">Sex</span><span class="v">${s.gender || '-'}</span></div>
+            <div class="id-pro-row"><span class="k">Father</span><span class="v">${s.fatherName || '-'}</span></div>
+            <div class="id-pro-qr">
+              <canvas id="idQrCanvas"></canvas>
+              <div class="hint">Scan QR for full photo &amp; student details</div>
+            </div>
+          </div>
+        </div>
+      </div>`;
 
     new bootstrap.Modal(document.getElementById('idCardModal')).show();
 
     const canvas = document.getElementById('idQrCanvas');
     if (typeof QRCode !== 'undefined' && canvas) {
       try {
-        await QRCode.toCanvas(canvas, url, { width: 72, margin: 1, color: { dark: '#0f172a', light: '#ffffff' } });
+        await QRCode.toCanvas(canvas, url, { width: 80, margin: 1, color: { dark: '#2d3436', light: '#ffffff' } });
       } catch (err) {
-        console.error(err);
         const img = document.createElement('img');
-        img.width = 72; img.height = 72;
-        img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=72x72&data=' + encodeURIComponent(url);
+        img.width = 80; img.height = 80;
+        img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=' + encodeURIComponent(url);
         canvas.replaceWith(img);
       }
     } else if (canvas) {
       const img = document.createElement('img');
-      img.width = 72; img.height = 72;
-      img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=72x72&data=' + encodeURIComponent(url);
+      img.width = 80; img.height = 80;
+      img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=' + encodeURIComponent(url);
       canvas.replaceWith(img);
     }
   }
 ,
-  exportData() {
+exportData() {
     const data = this.getFiltered().map(s => ({
       AdmissionNo: s.admissionNo,
       Name: s.fullName,
