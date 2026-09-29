@@ -1,54 +1,92 @@
 const Teachers = {
   filters: { search: '', status: '' },
+  _pendingPhoto: null,
+
   init() {
     this.bindEvents();
     this.render();
   },
+
   bindEvents() {
     document.getElementById('btnAddTeacher')?.addEventListener('click', () => this.openModal());
-    document.getElementById('searchTeacher')?.addEventListener('input', Utils.debounce(e => { this.filters.search = e.target.value.toLowerCase(); this.render(); }, 250));
-    document.getElementById('filterStatus')?.addEventListener('change', e => { this.filters.status = e.target.value; this.render(); });
+    document.getElementById('searchTeacher')?.addEventListener('input', Utils.debounce(e => {
+      this.filters.search = e.target.value.toLowerCase();
+      this.render();
+    }, 250));
+    document.getElementById('filterStatus')?.addEventListener('change', e => {
+      this.filters.status = e.target.value;
+      this.render();
+    });
     document.getElementById('teacherForm')?.addEventListener('submit', e => this.save(e));
+    document.getElementById('teacherPhoto')?.addEventListener('change', e => this.onPhotoChange(e));
+    document.getElementById('clearTeacherPhoto')?.addEventListener('click', () => {
+      this._pendingPhoto = null;
+      this.updatePhotoPreview(null);
+      const inp = document.getElementById('teacherPhoto');
+      if (inp) inp.value = '';
+    });
+    document.getElementById('printTeacherIdCard')?.addEventListener('click', () => window.print());
   },
+
   getFiltered() {
-    let list = Storage.getAll('teachers');
-    if (this.filters.search) list = list.filter(t => t.name.toLowerCase().includes(this.filters.search) || (t.email||'').toLowerCase().includes(this.filters.search));
+    let list = Storage.getAll('teachers') || [];
+    if (this.filters.search) {
+      list = list.filter(t =>
+        (t.name || '').toLowerCase().includes(this.filters.search) ||
+        (t.email || '').toLowerCase().includes(this.filters.search) ||
+        (t.phone || '').includes(this.filters.search)
+      );
+    }
     if (this.filters.status) list = list.filter(t => t.status === this.filters.status);
     return list;
   },
+
   render() {
     const list = this.getFiltered();
     const tbody = document.getElementById('teachersBody');
     const empty = document.getElementById('teachersEmpty');
-    if (!list.length) { tbody.innerHTML = ''; empty.classList.remove('d-none'); return; }
-    empty.classList.add('d-none');
+    if (!tbody) return;
+    if (!list.length) {
+      tbody.innerHTML = '';
+      empty?.classList.remove('d-none');
+      return;
+    }
+    empty?.classList.add('d-none');
     tbody.innerHTML = list.map(t => `
       <tr>
-        <td class="fw-medium">${t.name}</td>
+        <td class="fw-medium">${t.name || '-'}</td>
         <td>${t.designation || '-'}</td>
         <td>${t.phone || '-'}</td>
         <td>${t.email || '-'}</td>
-        <td>${Utils.formatDate(t.joiningDate)}</td>
-        <td>${Utils.formatCurrency(t.salary)}</td>
-        <td>${Utils.getStatusBadge(t.status)}</td>
-        <td>
+        <td>${Utils.formatDate ? Utils.formatDate(t.joiningDate) : (t.joiningDate || '-')}</td>
+        <td>${Utils.formatCurrency ? Utils.formatCurrency(t.salary) : (t.salary || '-')}</td>
+        <td>${Utils.getStatusBadge ? Utils.getStatusBadge(t.status) : (t.status || '-')}</td>
+        <td class="no-print">
           <div class="action-btns">
-            <button class="btn btn-sm btn-outline-primary" onclick="Teachers.openModal('${t.id}')"><i class="fas fa-edit"></i></button>
-            ${Utils.whatsAppButton(t.phone)}
-            <button class="btn btn-sm btn-outline-danger" onclick="Teachers.remove('${t.id}')"><i class="fas fa-trash"></i></button>
+            <button class="btn btn-sm btn-outline-dark" title="ID Card" onclick="Teachers.showIdCard('${t.id}')"><i class="fas fa-id-card"></i></button>
+            <button class="btn btn-sm btn-outline-primary" title="Edit" onclick="Teachers.openModal('${t.id}')"><i class="fas fa-edit"></i></button>
+            ${Utils.whatsAppButton ? Utils.whatsAppButton(t.phone) : ''}
+            <button class="btn btn-sm btn-outline-danger" title="Delete" onclick="Teachers.remove('${t.id}')"><i class="fas fa-trash"></i></button>
           </div>
         </td>
       </tr>`).join('');
   },
+
   openModal(id = null) {
     const form = document.getElementById('teacherForm');
-    form.reset(); form.classList.remove('was-validated');
+    form.reset();
+    form.classList.remove('was-validated');
     document.getElementById('teacherId').value = id || '';
     document.getElementById('teacherModalTitle').textContent = id ? 'Edit Teacher' : 'Add Teacher';
+    this._pendingPhoto = null;
+    this.updatePhotoPreview(null);
+    const photoInp = document.getElementById('teacherPhoto');
+    if (photoInp) photoInp.value = '';
+
     if (id) {
       const t = Storage.getById('teachers', id);
       if (!t) return;
-      document.getElementById('tName').value = t.name;
+      document.getElementById('tName').value = t.name || '';
       document.getElementById('tFather').value = t.fatherName || '';
       document.getElementById('tGender').value = t.gender || '';
       document.getElementById('tDob').value = t.dob || '';
@@ -61,13 +99,77 @@ const Teachers = {
       document.getElementById('tJoining').value = t.joiningDate || '';
       document.getElementById('tStatus').value = t.status || 'active';
       document.getElementById('tAddress').value = t.address || '';
+      this._pendingPhoto = t.photo || null;
+      this.updatePhotoPreview(t.photo || null);
     }
     new bootstrap.Modal(document.getElementById('teacherModal')).show();
   },
+
+  onPhotoChange(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      Toast.show('Select an image file', 'warning');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      Toast.show('Photo too large (max 5MB)', 'warning');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.compressPhoto(reader.result, (dataUrl) => {
+        if (!dataUrl) return;
+        this._pendingPhoto = dataUrl;
+        this.updatePhotoPreview(dataUrl);
+        Toast.show('Photo ready — Save dabayein', 'success');
+      });
+    };
+    reader.readAsDataURL(file);
+  },
+
+  compressPhoto(dataUrl, callback) {
+    const img = new Image();
+    img.onload = () => {
+      const max = 400;
+      let w = img.width, h = img.height;
+      if (w > max || h > max) {
+        if (w > h) { h = Math.round(h * max / w); w = max; }
+        else { w = Math.round(w * max / h); h = max; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      let out = canvas.toDataURL('image/jpeg', 0.75);
+      if (out.length > 120000) out = canvas.toDataURL('image/jpeg', 0.55);
+      callback(out);
+    };
+    img.onerror = () => { Toast.show('Invalid image', 'error'); callback(null); };
+    img.src = dataUrl;
+  },
+
+  updatePhotoPreview(src) {
+    const img = document.getElementById('teacherPhotoPreview');
+    const btn = document.getElementById('clearTeacherPhoto');
+    if (!img) return;
+    if (src) {
+      img.src = src;
+      img.style.display = 'block';
+      if (btn) btn.style.display = 'inline-block';
+    } else {
+      img.removeAttribute('src');
+      img.style.display = 'none';
+      if (btn) btn.style.display = 'none';
+    }
+  },
+
   save(e) {
     e.preventDefault();
     const form = e.target;
-    if (!form.checkValidity()) { form.classList.add('was-validated'); return; }
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
+      return;
+    }
     const id = document.getElementById('teacherId').value;
     const data = {
       name: document.getElementById('tName').value.trim(),
@@ -78,23 +180,175 @@ const Teachers = {
       email: document.getElementById('tEmail').value.trim(),
       designation: document.getElementById('tDesignation').value.trim(),
       qualification: document.getElementById('tQualification').value.trim(),
-      experience: parseInt(document.getElementById('tExperience').value) || 0,
-      salary: parseInt(document.getElementById('tSalary').value) || 0,
+      experience: document.getElementById('tExperience').value,
+      salary: Number(document.getElementById('tSalary').value) || 0,
       joiningDate: document.getElementById('tJoining').value,
       status: document.getElementById('tStatus').value,
       address: document.getElementById('tAddress').value.trim(),
-      subjects: [], classes: []
+      photo: this._pendingPhoto || null
     };
-    if (id) { Storage.update('teachers', id, data); Toast.show('Teacher updated', 'success'); }
-    else { Storage.add('teachers', data); Toast.show('Teacher added', 'success'); }
+
+    if (id && !this._pendingPhoto) {
+      const existing = Storage.getById('teachers', id);
+      if (existing && existing.photo) data.photo = existing.photo;
+    }
+
+    if (id) {
+      const updated = Storage.update('teachers', id, data);
+      if (!updated) {
+        Toast.show('Save failed — try smaller photo', 'error');
+        return;
+      }
+      Toast.show(data.photo ? 'Teacher + photo saved' : 'Teacher updated', 'success');
+    } else {
+      data.createdAt = new Date().toISOString();
+      Storage.add('teachers', data);
+      Toast.show(data.photo ? 'Teacher + photo saved' : 'Teacher added', 'success');
+    }
     bootstrap.Modal.getInstance(document.getElementById('teacherModal')).hide();
     this.render();
   },
+
   async remove(id) {
-    if (!(await Utils.confirmDelete('Delete this teacher?'))) return;
+    const ok = await Utils.confirmDelete('Delete this teacher?');
+    if (!ok) return;
     Storage.delete('teachers', id);
     Toast.show('Teacher deleted', 'success');
     this.render();
+  },
+
+  buildCardPayload(t) {
+    return {
+      n: t.name,
+      des: t.designation,
+      ph: t.phone,
+      em: t.email,
+      g: t.gender,
+      dob: t.dob,
+      f: t.fatherName,
+      q: t.qualification,
+      j: t.joiningDate,
+      ad: t.address,
+      st: t.status
+    };
+  },
+
+  encodePayload(obj) {
+    try {
+      const json = JSON.stringify(obj);
+      const b64 = btoa(unescape(encodeURIComponent(json)));
+      return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    } catch (e) {
+      return '';
+    }
+  },
+
+  async showIdCard(id) {
+    let t = Storage.getById('teachers', id);
+    if (!t) {
+      Toast.show('Teacher not found', 'error');
+      return;
+    }
+    const all = Storage.getAll('teachers') || [];
+    t = all.find(x => x.id === id) || t;
+
+    const logo = (typeof App !== 'undefined' && App.getSchoolLogo) ? App.getSchoolLogo() : 'assets/images/logo.jpg';
+    const hasPhoto = !!(t.photo && String(t.photo).startsWith('data:image'));
+    const photoHtml = hasPhoto
+      ? '<img src="' + t.photo + '" alt="Photo">'
+      : '<span>' + (t.name || 'T').charAt(0).toUpperCase() + '</span>';
+
+    const payload = this.buildCardPayload(t);
+    const enc = this.encodePayload(payload);
+    const base = location.href.replace(/[^/]*$/, 'teacher-card.html');
+    const url = base + '?id=' + encodeURIComponent(t.id) + (enc ? '&d=' + enc : '');
+
+    const body = document.getElementById('teacherIdCardBody');
+    if (!body) {
+      Toast.show('ID Card modal missing — upload teachers.html', 'error');
+      return;
+    }
+    const title = document.querySelector('#teacherIdCardModal .modal-title');
+    if (title) title.textContent = 'Teacher ID Card';
+
+    body.innerHTML = `
+      <div class="id-card-set">
+        <!-- FRONT -->
+        <div class="tid-card" id="teacherCardFront">
+          <span class="sid-label-tag">FRONT</span>
+          <div class="tid-front" style="width:100%;display:flex;flex-direction:column;">
+            <div class="tid-front-inner">
+              <div class="tid-left">
+                <div class="tid-photo">${photoHtml}</div>
+                <div class="tid-title">TEACHER</div>
+                <div class="tid-fields">
+                  <div><span class="k">Name</span><span class="v">${t.name || '-'}</span></div>
+                  <div><span class="k">Qualification</span><span class="v">${t.qualification || '-'}</span></div>
+                  <div><span class="k">Designation</span><span class="v">${t.designation || '-'}</span></div>
+                  <div><span class="k">Working Since</span><span class="v">${t.joiningDate || '-'}</span></div>
+                  <div><span class="k">Phone</span><span class="v">${t.phone || '-'}</span></div>
+                </div>
+                <div class="tid-left-logo">
+                  <img src="${logo}" alt="Logo" onerror="this.style.display='none'">
+                  <span>Al Bilawal Soomro</span>
+                </div>
+              </div>
+              <div class="tid-right">
+                <div class="tid-geo"></div>
+                <div class="tid-geo2"></div>
+                <div class="tid-right-content">
+                  <div class="school-v">Al Bilawal Soomro Public School</div>
+                </div>
+              </div>
+            </div>
+            <div class="tid-gold-bar"></div>
+          </div>
+        </div>
+
+        <!-- BACK -->
+        <div class="tid-card" id="teacherCardBack">
+          <span class="sid-label-tag">BACK</span>
+          <div class="tid-back">
+            <div class="tid-back-top">
+              <div class="tid-back-logo">
+                <img src="${logo}" alt="Logo" onerror="this.style.display='none'">
+                <div class="sn">Al Bilawal Soomro Public School</div>
+              </div>
+              <div class="tid-terms">
+                <h6>Terms &amp; Conditions</h6>
+                <p>This staff identity card is the property of Al Bilawal Soomro Public School. If found, please return to the school office. Card is non-transferable and must be carried while on duty.</p>
+              </div>
+              <div class="tid-qr-wrap">
+                <canvas id="teacherQrCanvas"></canvas>
+                <div class="hint">Scan QR for full teacher profile &amp; photo</div>
+              </div>
+              <div class="tid-contact">
+                <div><i class="fas fa-phone"></i> ${t.phone || '0326-7029939'}</div>
+                <div><i class="fas fa-envelope"></i> ${t.email || 'info@school.pk'}</div>
+                <div><i class="fas fa-map-marker-alt"></i> ${t.address || 'Qamber, Pakistan'}</div>
+              </div>
+            </div>
+            <div class="tid-back-gold">AL BILAWAL SOOMRO PUBLIC SCHOOL</div>
+          </div>
+        </div>
+      </div>`;
+
+    new bootstrap.Modal(document.getElementById('teacherIdCardModal')).show();
+
+    const canvas = document.getElementById('teacherQrCanvas');
+    const drawFallback = () => {
+      const img = document.createElement('img');
+      img.width = 90; img.height = 90; img.alt = 'QR';
+      img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=' + encodeURIComponent(url);
+      if (canvas && canvas.parentNode) canvas.replaceWith(img);
+    };
+    if (typeof QRCode !== 'undefined' && canvas) {
+      try {
+        await QRCode.toCanvas(canvas, url, { width: 90, margin: 1, color: { dark: '#0b1f3a', light: '#ffffff' } });
+      } catch (err) { drawFallback(); }
+    } else { drawFallback(); }
   }
+
 };
-window.Teachers = Teachers;
+
+window.Teachers
