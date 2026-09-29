@@ -9,6 +9,134 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="css/style.css" rel="stylesheet">
   <link href="css/responsive.css" rel="stylesheet">
+
+  <style>
+    .id-card-set { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center; padding: 8px; }
+    /* ===== Teacher ID Card — Institute style ===== */
+    .tid-card {
+      width: 320px; height: 480px; border-radius: 6px; overflow: hidden;
+      box-shadow: 0 12px 32px rgba(15,23,42,.18);
+      font-family: Inter, system-ui, sans-serif; position: relative;
+      background: #fff; display: flex;
+    }
+    /* FRONT */
+    .tid-front { width: 100%; display: flex; flex-direction: column; position: relative; background: #f8fafc; }
+    .tid-front-inner { display: flex; flex: 1; min-height: 0; }
+    .tid-left {
+      width: 48%; background: #0b1f3a; color: #fff;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 18px 10px 14px; position: relative; z-index: 2;
+    }
+    .tid-photo {
+      width: 92px; height: 92px; border-radius: 12px;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      overflow: hidden; background: #1e3a5f;
+      border: 3px solid #c9a227; margin-bottom: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: 800; color: #fff;
+    }
+    .tid-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .tid-title {
+      font-size: 1.35rem; font-weight: 900; letter-spacing: .12em;
+      margin: 4px 0 14px; text-align: center;
+    }
+    .tid-fields { width: 100%; font-size: 0.68rem; line-height: 1.55; padding: 0 4px; }
+    .tid-fields div { margin-bottom: 6px; }
+    .tid-fields .k { color: #94a3b8; display: block; font-size: 0.6rem; text-transform: uppercase; letter-spacing: .04em; }
+    .tid-fields .v { font-weight: 600; color: #fff; word-break: break-word; }
+    .tid-left-logo {
+      margin-top: auto; padding-top: 10px; text-align: center;
+    }
+    .tid-left-logo img {
+      width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: #fff;
+    }
+    .tid-left-logo span { display: block; font-size: 0.55rem; color: #c9a227; margin-top: 4px; font-weight: 600; }
+    .tid-right {
+      width: 52%; background: #fff; position: relative; overflow: hidden;
+    }
+    .tid-geo {
+      position: absolute; right: -30px; top: -20px;
+      width: 140px; height: 140px; border-radius: 50%;
+      background: linear-gradient(135deg, #e0f2fe, #bae6fd); opacity: .9;
+    }
+    .tid-geo2 {
+      position: absolute; right: -10px; bottom: 80px;
+      width: 90px; height: 90px; border-radius: 50%;
+      background: linear-gradient(135deg, #dbeafe, #93c5fd); opacity: .5;
+    }
+    .tid-right-content {
+      position: relative; z-index: 1; height: 100%;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 16px 12px 20px;
+    }
+    .tid-right-content .school-v {
+      writing-mode: vertical-rl; transform: rotate(180deg);
+      font-size: 0.7rem; font-weight: 700; color: #0b1f3a;
+      letter-spacing: .08em; margin-bottom: 12px; align-self: flex-start;
+    }
+    .tid-gold-bar {
+      height: 28px; background: linear-gradient(90deg, #c9a227, #e8c547);
+      width: 100%; flex-shrink: 0;
+    }
+    /* BACK */
+    .tid-back {
+      width: 100%; display: flex; flex-direction: column; background: #fff;
+    }
+    .tid-back-top {
+      flex: 1; padding: 20px 18px 12px; position: relative;
+      background: linear-gradient(180deg, #f0f9ff 0%, #fff 40%);
+    }
+    .tid-back-logo {
+      text-align: center; margin-bottom: 12px;
+    }
+    .tid-back-logo img {
+      width: 48px; height: 48px; border-radius: 10px; object-fit: cover; background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,.1);
+    }
+    .tid-back-logo .sn {
+      font-weight: 800; font-size: 0.8rem; color: #0b1f3a; margin-top: 6px;
+      text-transform: uppercase;
+    }
+    .tid-terms h6 {
+      font-size: 0.75rem; font-weight: 700; color: #0b1f3a; margin-bottom: 6px;
+      border-bottom: 2px solid #c9a227; display: inline-block; padding-bottom: 2px;
+    }
+    .tid-terms p {
+      font-size: 0.62rem; color: #64748b; line-height: 1.45; margin-bottom: 12px;
+    }
+    .tid-qr-wrap {
+      display: flex; align-items: center; gap: 12px; margin: 10px 0;
+    }
+    .tid-qr-wrap canvas, .tid-qr-wrap img {
+      width: 90px !important; height: 90px !important;
+      border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px; background: #fff;
+    }
+    .tid-qr-wrap .hint { font-size: 0.65rem; color: #64748b; max-width: 140px; }
+    .tid-contact {
+      font-size: 0.65rem; color: #334155; line-height: 1.6; margin-top: 8px;
+    }
+    .tid-contact i { color: #0b3a6e; width: 14px; margin-right: 4px; }
+    .tid-back-gold {
+      height: 32px; background: linear-gradient(90deg, #c9a227, #e8c547);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 700; color: #0b1f3a; letter-spacing: .06em;
+    }
+    .sid-label-tag {
+      position: absolute; top: 6px; right: 6px; z-index: 5;
+      background: rgba(11,31,58,.75); color: #fff; font-size: 0.55rem;
+      padding: 2px 7px; border-radius: 6px;
+    }
+    @media print {
+      body * { visibility: hidden !important; }
+      #teacherIdCardModal, #teacherIdCardModal * { visibility: visible !important; }
+      #teacherIdCardModal { position: fixed; left: 0; top: 0; }
+      .modal-backdrop, .no-print { display: none !important; }
+      .modal { position: static !important; }
+      .modal-dialog { max-width: none !important; margin: 0 !important; }
+      .modal-content { border: none !important; box-shadow: none !important; }
+      .tid-card { box-shadow: none; border: 1px solid #cbd5e1; page-break-inside: avoid; }
+    }
+  </style>
 </head>
 <body>
   <div class="app-wrapper">
@@ -47,6 +175,20 @@
           <div class="modal-body">
             <input type="hidden" id="teacherId">
             <div class="row g-3">
+              <div class="col-12">
+                <div class="border rounded p-3 bg-light mb-1">
+                  <label class="form-label fw-semibold mb-2"><i class="fas fa-camera me-1 text-primary"></i> Teacher Photo (ID Card)</label>
+                  <div class="d-flex flex-wrap align-items-center gap-3">
+                    <img id="teacherPhotoPreview" alt="Preview" style="width:80px;height:80px;object-fit:cover;border-radius:10px;border:2px solid #0b3a6e;display:none;background:#fff;">
+                    <div class="flex-grow-1" style="min-width:180px;">
+                      <input type="file" class="form-control" id="teacherPhoto" accept="image/*">
+                      <div class="form-text">JPG/PNG — ID card aur QR scan pe dikhegi</div>
+                      <button type="button" class="btn btn-sm btn-outline-danger mt-1" id="clearTeacherPhoto" style="display:none;"><i class="fas fa-trash me-1"></i>Remove Photo</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div class="col-md-6"><label class="form-label">Full Name *</label><input type="text" class="form-control" id="tName" required></div>
               <div class="col-md-6"><label class="form-label">Father's Name</label><input type="text" class="form-control" id="tFather"></div>
               <div class="col-md-4"><label class="form-label">Gender *</label><select class="form-select" id="tGender" required><option value="">Select</option><option>Male</option><option>Female</option></select></div>
@@ -71,6 +213,25 @@
     </div>
   </div>
 
+
+  <!-- Teacher ID Card Modal -->
+  <div class="modal fade" id="teacherIdCardModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header no-print">
+          <h5 class="modal-title">Teacher ID Card</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body d-flex justify-content-center" id="teacherIdCardBody"></div>
+        <div class="modal-footer no-print">
+          <button type="button" class="btn btn-outline-primary" id="printTeacherIdCard"><i class="fas fa-print me-1"></i>Print</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/utils.js"></script>
