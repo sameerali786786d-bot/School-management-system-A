@@ -41,7 +41,7 @@ const App = {
       }
       if (custom) return custom;
     } catch (e) {}
-    return 'assets/images/logo.jpg';
+    return 'assets/images/logo.png';
   },
 
   setSchoolLogo(dataUrl) {

@@ -354,7 +354,7 @@ const PageModule = {
     try {
       current = localStorage.getItem('smps_schoolLogo');
       if (current === '') current = '';
-      else if (!current) current = 'assets/images/logo.jpg';
+      else if (!current) current = 'assets/images/logo.png';
     } catch (e) {}
     showLogo(current || '');
     if (current) preview.dataset.pending = current;

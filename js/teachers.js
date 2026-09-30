@@ -252,7 +252,7 @@ const Teachers = {
     const all = Storage.getAll('teachers') || [];
     t = all.find(x => x.id === id) || t;
 
-    const logo = (typeof App !== 'undefined' && App.getSchoolLogo) ? App.getSchoolLogo() : 'assets/images/logo.jpg';
+    const logo = (typeof App !== 'undefined' && App.getSchoolLogo) ? App.getSchoolLogo() : 'assets/images/logo.png';
     const hasPhoto = !!(t.photo && String(t.photo).startsWith('data:image'));
     const photoHtml = hasPhoto
       ? '<img src="' + t.photo + '" alt="Photo">'
