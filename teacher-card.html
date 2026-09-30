@@ -3,30 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teacher ID - Al Bilawal Soomro Public School</title>
+  <title>Teacher Profile - Al Bilawal Soomro Public School</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <style>
-    body { margin:0; min-height:100vh; background:linear-gradient(160deg,#0b3a6e,#0ea5e9); font-family:Inter,system-ui,sans-serif; padding:1.25rem; }
+    body { margin:0; min-height:100vh; background:linear-gradient(160deg,#1e3a8a,#3b82f6); font-family:Inter,system-ui,sans-serif; padding:1.25rem; }
     .wrap { max-width:400px; margin:0 auto; }
     .card { background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,.25); }
-    .head { background:#0b3a6e; color:#fff; text-align:center; padding:1.25rem 1rem 2.5rem; position:relative; }
-    .head img.logo { width:52px; height:52px; border-radius:10px; object-fit:cover; background:#fff; }
-    .head .school { margin-top:8px; font-weight:800; font-size:1.05rem; color:#fb923c; text-transform:uppercase; line-height:1.25; }
-    .head .tag { font-size:.7rem; color:#93c5fd; letter-spacing:.08em; }
-    .wave { position:absolute; left:0; right:0; bottom:-1px; height:40px; background:#fff; border-radius:50% 50% 0 0 / 100% 100% 0 0; }
-    .photo { width:120px; height:120px; margin:-20px auto 0; border-radius:14px; border:4px solid #0b3a6e; overflow:hidden; background:#e2e8f0; display:flex; align-items:center; justify-content:center; font-size:2.8rem; font-weight:800; color:#0b3a6e; box-shadow:0 6px 16px rgba(11,58,110,.25); }
+    .head { background:#bfdbfe; text-align:center; padding:1.25rem 1rem 2.2rem; position:relative; }
+    .head .logo { width:48px; height:48px; border-radius:10px; object-fit:cover; background:#fff; }
+    .head .school { margin-top:8px; font-weight:800; font-size:.95rem; color:#1e3a8a; text-transform:uppercase; }
+    .wave { position:absolute; left:0; right:0; bottom:-1px; height:36px; background:#fff; border-radius:50% 50% 0 0 / 100% 100% 0 0; }
+    .photo { width:120px; height:120px; margin:-28px auto 0; border-radius:50%; border:5px solid #fff; overflow:hidden; background:#e2e8f0; display:flex; align-items:center; justify-content:center; font-size:2.8rem; font-weight:800; color:#1e3a8a; box-shadow:0 6px 16px rgba(30,58,138,.25); }
     .photo img { width:100%; height:100%; object-fit:cover; }
     .body { padding:12px 1.25rem 1.5rem; text-align:center; }
-    .name { font-size:1.25rem; font-weight:800; text-transform:uppercase; color:#0f172a; margin:10px 0 2px; }
-    .role { font-size:.75rem; letter-spacing:.15em; color:#64748b; font-weight:600; margin-bottom:14px; }
-    .row { display:flex; justify-content:space-between; gap:8px; padding:8px 0; border-bottom:1px solid #f1f5f9; font-size:.9rem; }
+    .name { font-size:1.25rem; font-weight:800; color:#0f172a; margin:10px 0 2px; }
+    .role { font-size:.8rem; color:#3b82f6; font-weight:600; margin-bottom:14px; }
+    .row { display:flex; justify-content:space-between; gap:8px; padding:8px 0; border-bottom:1px solid #f1f5f9; font-size:.88rem; }
     .row .l { color:#64748b; } .row .v { font-weight:600; color:#0f172a; text-align:right; }
     .err { color:#fff; text-align:center; padding:3rem 1rem; }
-    .foot { text-align:center; color:rgba(255,255,255,.85); font-size:.75rem; margin-top:1rem; }
+    .foot { text-align:center; color:rgba(255,255,255,.9); font-size:.75rem; margin-top:1rem; }
   </style>
 </head>
 <body>
-  <div class="wrap" id="app"><div class="text-center text-white py-5"><div class="spinner-border"></div><p class="mt-2">Loading...</p></div></div>
+  <div class="wrap" id="app"><div class="text-center text-white py-5"><div class="spinner-border"></div><p class="mt-2">Loading profile...</p></div></div>
   <script src="js/storage.js"></script>
   <script>
     function qs(n){return new URLSearchParams(location.search).get(n);}
@@ -41,21 +41,19 @@
       document.getElementById('app').innerHTML=`
         <div class="card">
           <div class="head">
-            <img class="logo" src="${getLogo()}" alt="Logo" onerror="this.style.display='none'">
+            <img class="logo" src="${getLogo()}" alt="School Logo" onerror="this.style.display='none'">
             <div class="school">Al Bilawal Soomro Public School</div>
-            <div class="tag">QUEST FOR EXCELLENCE</div>
             <div class="wave"></div>
           </div>
           <div class="photo">${photo}</div>
           <div class="body">
             <div class="name">${t.name||'-'}</div>
-            <div class="role">TEACHER</div>
+            <div class="role">${t.designation||t.des||'Teacher'}</div>
             <div>
-              <div class="row"><span class="l">Designation</span><span class="v">${t.designation||t.des||'-'}</span></div>
               <div class="row"><span class="l">Phone</span><span class="v">${t.phone||t.ph||'-'}</span></div>
               <div class="row"><span class="l">Email</span><span class="v">${t.email||t.em||'-'}</span></div>
               <div class="row"><span class="l">Gender</span><span class="v">${t.gender||t.g||'-'}</span></div>
-              <div class="row"><span class="l">Date of Birth</span><span class="v">${t.dob||'-'}</span></div>
+              <div class="row"><span class="l">DOB</span><span class="v">${t.dob||'-'}</span></div>
               <div class="row"><span class="l">Father</span><span class="v">${t.fatherName||t.f||'-'}</span></div>
               <div class="row"><span class="l">Qualification</span><span class="v">${t.qualification||t.q||'-'}</span></div>
               <div class="row"><span class="l">Joining</span><span class="v">${t.joiningDate||t.j||'-'}</span></div>
@@ -63,24 +61,22 @@
             </div>
           </div>
         </div>
-        <div class="foot">Verified Teacher ID • Al Bilawal Soomro Public School</div>`;
+        <div class="foot">Verified Teacher Profile • Al Bilawal Soomro Public School</div>`;
     }
     function fromPayload(p){
       return {name:p.n,designation:p.des,phone:p.ph,email:p.em,gender:p.g,dob:p.dob,fatherName:p.f,qualification:p.q,joiningDate:p.j,address:p.ad,status:p.st};
     }
     (function(){
       const id=qs('id'), d=qs('d');
-      if(d){
-        try{
-          const json=decodeURIComponent(escape(atob(d.replace(/-/g,'+').replace(/_/g,'/'))));
-          let t=fromPayload(JSON.parse(json));
-          if(id){const local=findTeacher(id);if(local){t=Object.assign({},t,local);if(local.photo)t.photo=local.photo;}}
-          render(t);return;
-        }catch(e){console.warn(e);}
-      }
+      if(d){try{
+        const json=decodeURIComponent(escape(atob(d.replace(/-/g,'+').replace(/_/g,'/'))));
+        let t=fromPayload(JSON.parse(json));
+        if(id){const local=findTeacher(id);if(local){t=Object.assign({},t,local);if(local.photo)t.photo=local.photo;}}
+        render(t);return;
+      }catch(e){console.warn(e);}}
       if(!id){document.getElementById('app').innerHTML='<div class="err"><h5>Invalid QR</h5></div>';return;}
       const t=findTeacher(id);
-      if(!t){document.getElementById('app').innerHTML='<div class="err"><h5>Teacher not found</h5><p>Use school device or fresh QR.</p></div>';return;}
+      if(!t){document.getElementById('app').innerHTML='<div class="err"><h5>Teacher not found</h5></div>';return;}
       render(t);
     })();
   </script>

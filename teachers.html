@@ -12,118 +12,118 @@
 
   <style>
     .id-card-set { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center; padding: 8px; }
-    /* ===== Teacher ID Card — Institute style ===== */
     .tid-card {
-      width: 320px; height: 480px; border-radius: 6px; overflow: hidden;
-      box-shadow: 0 12px 32px rgba(15,23,42,.18);
+      width: 280px; height: 450px; border-radius: 14px; overflow: hidden;
+      box-shadow: 0 12px 36px rgba(37, 99, 235, .22);
       font-family: Inter, system-ui, sans-serif; position: relative;
-      background: #fff; display: flex;
+      background: #fff;
     }
     /* FRONT */
-    .tid-front { width: 100%; display: flex; flex-direction: column; position: relative; background: #f8fafc; }
-    .tid-front-inner { display: flex; flex: 1; min-height: 0; }
-    .tid-left {
-      width: 48%; background: #0b1f3a; color: #fff;
-      display: flex; flex-direction: column; align-items: center;
-      padding: 18px 10px 14px; position: relative; z-index: 2;
+    .tid2-front {
+      width: 100%; height: 100%; display: flex; flex-direction: column;
+      background: #1e3a8a; position: relative; overflow: hidden;
     }
-    .tid-photo {
-      width: 92px; height: 92px; border-radius: 12px;
-      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-      overflow: hidden; background: #1e3a5f;
-      border: 3px solid #c9a227; margin-bottom: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2rem; font-weight: 800; color: #fff;
+    .tid2-front-top {
+      height: 46%; background: #bfdbfe; position: relative;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding-top: 8px;
     }
-    .tid-photo img { width: 100%; height: 100%; object-fit: cover; }
-    .tid-title {
-      font-size: 1.35rem; font-weight: 900; letter-spacing: .12em;
-      margin: 4px 0 14px; text-align: center;
-    }
-    .tid-fields { width: 100%; font-size: 0.68rem; line-height: 1.55; padding: 0 4px; }
-    .tid-fields div { margin-bottom: 6px; }
-    .tid-fields .k { color: #94a3b8; display: block; font-size: 0.6rem; text-transform: uppercase; letter-spacing: .04em; }
-    .tid-fields .v { font-weight: 600; color: #fff; word-break: break-word; }
-    .tid-left-logo {
-      margin-top: auto; padding-top: 10px; text-align: center;
-    }
-    .tid-left-logo img {
-      width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: #fff;
-    }
-    .tid-left-logo span { display: block; font-size: 0.55rem; color: #c9a227; margin-top: 4px; font-weight: 600; }
-    .tid-right {
-      width: 52%; background: #fff; position: relative; overflow: hidden;
-    }
-    .tid-geo {
-      position: absolute; right: -30px; top: -20px;
+    .tid2-blob1 {
+      position: absolute; top: -40px; left: -30px;
       width: 140px; height: 140px; border-radius: 50%;
-      background: linear-gradient(135deg, #e0f2fe, #bae6fd); opacity: .9;
+      background: #93c5fd; opacity: .7;
     }
-    .tid-geo2 {
-      position: absolute; right: -10px; bottom: 80px;
-      width: 90px; height: 90px; border-radius: 50%;
-      background: linear-gradient(135deg, #dbeafe, #93c5fd); opacity: .5;
+    .tid2-blob2 {
+      position: absolute; top: 10px; right: -45px;
+      width: 150px; height: 150px; border-radius: 50%;
+      background: #3b82f6; opacity: .35;
     }
-    .tid-right-content {
-      position: relative; z-index: 1; height: 100%;
-      display: flex; flex-direction: column; justify-content: flex-end;
-      padding: 16px 12px 20px;
+    .tid2-logo-sm {
+      width: 36px; height: 36px; border-radius: 8px; object-fit: cover;
+      background: #fff; z-index: 2; margin-bottom: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.12);
     }
-    .tid-right-content .school-v {
-      writing-mode: vertical-rl; transform: rotate(180deg);
-      font-size: 0.7rem; font-weight: 700; color: #0b1f3a;
-      letter-spacing: .08em; margin-bottom: 12px; align-self: flex-start;
+    .tid2-photo {
+      width: 118px; height: 118px; border-radius: 50%;
+      border: 5px solid #fff; overflow: hidden; background: #e2e8f0;
+      box-shadow: 0 8px 24px rgba(30, 58, 138, .25);
+      z-index: 2; display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; font-weight: 800; color: #1e3a8a;
     }
-    .tid-gold-bar {
-      height: 28px; background: linear-gradient(90deg, #c9a227, #e8c547);
-      width: 100%; flex-shrink: 0;
+    .tid2-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .tid2-front-bottom {
+      flex: 1; background: #1e3a8a; color: #fff;
+      padding: 18px 16px 14px; text-align: center; position: relative;
     }
+    .tid2-dots {
+      position: absolute; width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(147, 197, 253, .45);
+    }
+    .tid2-name {
+      font-size: 1.2rem; font-weight: 800; margin-bottom: 2px;
+    }
+    .tid2-role {
+      font-size: 0.85rem; color: #93c5fd; margin-bottom: 12px; font-weight: 500;
+    }
+    .tid2-info {
+      text-align: left; font-size: 0.75rem; line-height: 1.75;
+      color: #e0e7ff; max-width: 230px; margin: 0 auto;
+    }
+    .tid2-info i { width: 16px; color: #93c5fd; margin-right: 6px; }
     /* BACK */
-    .tid-back {
-      width: 100%; display: flex; flex-direction: column; background: #fff;
+    .tid2-back {
+      width: 100%; height: 100%; background: #bfdbfe;
+      position: relative; overflow: hidden;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 22px 18px 16px; text-align: center;
     }
-    .tid-back-top {
-      flex: 1; padding: 20px 18px 12px; position: relative;
-      background: linear-gradient(180deg, #f0f9ff 0%, #fff 40%);
+    .tid2-back-blob1 {
+      position: absolute; top: -30px; right: -40px;
+      width: 130px; height: 130px; border-radius: 50%;
+      background: #3b82f6; opacity: .4;
     }
-    .tid-back-logo {
-      text-align: center; margin-bottom: 12px;
+    .tid2-back-blob2 {
+      position: absolute; bottom: -20px; left: -30px;
+      width: 120px; height: 120px; border-radius: 40% 60%;
+      background: #1e3a8a; opacity: .25;
     }
-    .tid-back-logo img {
-      width: 48px; height: 48px; border-radius: 10px; object-fit: cover; background: #fff;
-      box-shadow: 0 2px 8px rgba(0,0,0,.1);
+    .tid2-back-logo {
+      width: 56px; height: 56px; border-radius: 12px; object-fit: cover;
+      background: #fff; z-index: 1; margin-bottom: 8px;
+      box-shadow: 0 4px 12px rgba(30,58,138,.2);
     }
-    .tid-back-logo .sn {
-      font-weight: 800; font-size: 0.8rem; color: #0b1f3a; margin-top: 6px;
-      text-transform: uppercase;
+    .tid2-back-school {
+      font-size: 0.95rem; font-weight: 800; color: #1e3a8a;
+      text-transform: uppercase; letter-spacing: .03em; z-index: 1;
+      line-height: 1.25; margin-bottom: 10px;
     }
-    .tid-terms h6 {
-      font-size: 0.75rem; font-weight: 700; color: #0b1f3a; margin-bottom: 6px;
-      border-bottom: 2px solid #c9a227; display: inline-block; padding-bottom: 2px;
+    .tid2-back-dates {
+      font-size: 0.75rem; color: #1e40af; z-index: 1; margin-bottom: 6px;
+      font-weight: 600;
     }
-    .tid-terms p {
-      font-size: 0.62rem; color: #64748b; line-height: 1.45; margin-bottom: 12px;
+    .tid2-back-dates span { display: block; margin-bottom: 2px; }
+    .tid2-back-note {
+      font-size: 0.6rem; color: #64748b; max-width: 210px;
+      margin: 0 auto 12px; z-index: 1; line-height: 1.4;
     }
-    .tid-qr-wrap {
-      display: flex; align-items: center; gap: 12px; margin: 10px 0;
+    .tid2-qr {
+      background: #fff; padding: 10px; border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(30, 58, 138, .15);
+      z-index: 1;
     }
-    .tid-qr-wrap canvas, .tid-qr-wrap img {
-      width: 90px !important; height: 90px !important;
-      border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px; background: #fff;
+    .tid2-qr canvas, .tid2-qr img {
+      display: block; width: 115px !important; height: 115px !important;
     }
-    .tid-qr-wrap .hint { font-size: 0.65rem; color: #64748b; max-width: 140px; }
-    .tid-contact {
-      font-size: 0.65rem; color: #334155; line-height: 1.6; margin-top: 8px;
-    }
-    .tid-contact i { color: #0b3a6e; width: 14px; margin-right: 4px; }
-    .tid-back-gold {
-      height: 32px; background: linear-gradient(90deg, #c9a227, #e8c547);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.65rem; font-weight: 700; color: #0b1f3a; letter-spacing: .06em;
+    .tid2-grid {
+      position: absolute; bottom: 14px; right: 14px;
+      width: 36px; height: 36px; opacity: .25;
+      background-image: linear-gradient(#1e3a8a 1px, transparent 1px),
+        linear-gradient(90deg, #1e3a8a 1px, transparent 1px);
+      background-size: 9px 9px;
     }
     .sid-label-tag {
-      position: absolute; top: 6px; right: 6px; z-index: 5;
-      background: rgba(11,31,58,.75); color: #fff; font-size: 0.55rem;
+      position: absolute; top: 8px; left: 8px; z-index: 5;
+      background: rgba(30,58,138,.7); color: #fff; font-size: 0.55rem;
       padding: 2px 7px; border-radius: 6px;
     }
     @media print {
