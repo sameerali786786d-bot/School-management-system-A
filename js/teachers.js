@@ -263,72 +263,66 @@ const Teachers = {
     const base = location.href.replace(/[^/]*$/, 'teacher-card.html');
     const url = base + '?id=' + encodeURIComponent(t.id) + (enc ? '&d=' + enc : '');
 
+    let expire = '-';
+    try {
+      if (t.joiningDate) {
+        const d = new Date(t.joiningDate);
+        d.setFullYear(d.getFullYear() + 1);
+        expire = d.toISOString().slice(0, 10);
+      }
+    } catch (e) {}
+
     const body = document.getElementById('teacherIdCardBody');
     if (!body) {
       Toast.show('ID Card modal missing — upload teachers.html', 'error');
       return;
     }
-    const title = document.querySelector('#teacherIdCardModal .modal-title');
-    if (title) title.textContent = 'Teacher ID Card';
+    const titleEl = document.querySelector('#teacherIdCardModal .modal-title');
+    if (titleEl) titleEl.textContent = 'Teacher ID Card';
 
     body.innerHTML = `
       <div class="id-card-set">
-        <!-- FRONT -->
+        <!-- FRONT: profile photo + school logo -->
         <div class="tid-card" id="teacherCardFront">
           <span class="sid-label-tag">FRONT</span>
-          <div class="tid-front" style="width:100%;display:flex;flex-direction:column;">
-            <div class="tid-front-inner">
-              <div class="tid-left">
-                <div class="tid-photo">${photoHtml}</div>
-                <div class="tid-title">TEACHER</div>
-                <div class="tid-fields">
-                  <div><span class="k">Name</span><span class="v">${t.name || '-'}</span></div>
-                  <div><span class="k">Qualification</span><span class="v">${t.qualification || '-'}</span></div>
-                  <div><span class="k">Designation</span><span class="v">${t.designation || '-'}</span></div>
-                  <div><span class="k">Working Since</span><span class="v">${t.joiningDate || '-'}</span></div>
-                  <div><span class="k">Phone</span><span class="v">${t.phone || '-'}</span></div>
-                </div>
-                <div class="tid-left-logo">
-                  <img src="${logo}" alt="Logo" onerror="this.style.display='none'">
-                  <span>Al Bilawal Soomro</span>
-                </div>
-              </div>
-              <div class="tid-right">
-                <div class="tid-geo"></div>
-                <div class="tid-geo2"></div>
-                <div class="tid-right-content">
-                  <div class="school-v">Al Bilawal Soomro Public School</div>
-                </div>
+          <div class="tid2-front">
+            <div class="tid2-front-top">
+              <div class="tid2-blob1"></div>
+              <div class="tid2-blob2"></div>
+              <img class="tid2-logo-sm" src="${logo}" alt="School Logo" onerror="this.style.display='none'">
+              <div class="tid2-photo">${photoHtml}</div>
+            </div>
+            <div class="tid2-front-bottom">
+              <div class="tid2-dots" style="top:12px;left:16px;"></div>
+              <div class="tid2-dots" style="top:28px;left:22px;"></div>
+              <div class="tid2-dots" style="bottom:40px;right:18px;"></div>
+              <div class="tid2-dots" style="bottom:24px;right:28px;"></div>
+              <div class="tid2-name">${t.name || '-'}</div>
+              <div class="tid2-role">${t.designation || 'Teacher'}</div>
+              <div class="tid2-info">
+                <div><i class="fas fa-map-marker-alt"></i>${t.address || 'Al Bilawal Soomro Public School'}</div>
+                <div><i class="fas fa-phone"></i>${t.phone || '-'}</div>
+                <div><i class="fas fa-envelope"></i>${t.email || '-'}</div>
               </div>
             </div>
-            <div class="tid-gold-bar"></div>
           </div>
         </div>
 
-        <!-- BACK -->
+        <!-- BACK: school logo + QR + dates -->
         <div class="tid-card" id="teacherCardBack">
           <span class="sid-label-tag">BACK</span>
-          <div class="tid-back">
-            <div class="tid-back-top">
-              <div class="tid-back-logo">
-                <img src="${logo}" alt="Logo" onerror="this.style.display='none'">
-                <div class="sn">Al Bilawal Soomro Public School</div>
-              </div>
-              <div class="tid-terms">
-                <h6>Terms &amp; Conditions</h6>
-                <p>This staff identity card is the property of Al Bilawal Soomro Public School. If found, please return to the school office. Card is non-transferable and must be carried while on duty.</p>
-              </div>
-              <div class="tid-qr-wrap">
-                <canvas id="teacherQrCanvas"></canvas>
-                <div class="hint">Scan QR for full teacher profile &amp; photo</div>
-              </div>
-              <div class="tid-contact">
-                <div><i class="fas fa-phone"></i> ${t.phone || '0326-7029939'}</div>
-                <div><i class="fas fa-envelope"></i> ${t.email || 'info@school.pk'}</div>
-                <div><i class="fas fa-map-marker-alt"></i> ${t.address || 'Qamber, Pakistan'}</div>
-              </div>
+          <div class="tid2-back">
+            <div class="tid2-back-blob1"></div>
+            <div class="tid2-back-blob2"></div>
+            <img class="tid2-back-logo" src="${logo}" alt="School Logo" onerror="this.style.display='none'">
+            <div class="tid2-back-school">Al Bilawal Soomro<br>Public School</div>
+            <div class="tid2-back-dates">
+              <span>JOIN : ${t.joiningDate || '-'}</span>
+              <span>EXPIRED : ${expire}</span>
             </div>
-            <div class="tid-back-gold">AL BILAWAL SOOMRO PUBLIC SCHOOL</div>
+            <div class="tid2-back-note">Official staff ID. Property of the school. If found, return to office. Non-transferable.</div>
+            <div class="tid2-qr"><canvas id="teacherQrCanvas"></canvas></div>
+            <div class="tid2-grid"></div>
           </div>
         </div>
       </div>`;
@@ -338,17 +332,17 @@ const Teachers = {
     const canvas = document.getElementById('teacherQrCanvas');
     const drawFallback = () => {
       const img = document.createElement('img');
-      img.width = 90; img.height = 90; img.alt = 'QR';
-      img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=' + encodeURIComponent(url);
+      img.width = 115; img.height = 115; img.alt = 'QR';
+      img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=115x115&data=' + encodeURIComponent(url);
       if (canvas && canvas.parentNode) canvas.replaceWith(img);
     };
     if (typeof QRCode !== 'undefined' && canvas) {
       try {
-        await QRCode.toCanvas(canvas, url, { width: 90, margin: 1, color: { dark: '#0b1f3a', light: '#ffffff' } });
+        await QRCode.toCanvas(canvas, url, { width: 115, margin: 1, color: { dark: '#1e3a8a', light: '#ffffff' } });
       } catch (err) { drawFallback(); }
     } else { drawFallback(); }
   }
 
 };
 
-window.Teachers
+window.Teachers = Teachers;
