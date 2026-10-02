@@ -35,12 +35,10 @@ const App = {
   getSchoolLogo() {
     try {
       const custom = localStorage.getItem('smps_schoolLogo');
-      if (custom === '') {
-        // removed — use letter fallback via onerror or empty
-        return '';
-      }
-      if (custom) return custom;
+      // custom base64 from Settings takes priority
+      if (custom && custom.startsWith('data:image')) return custom;
     } catch (e) {}
+    // always show school crest from assets (left sidebar)
     return 'assets/images/logo.png';
   },
 
@@ -61,8 +59,11 @@ const App = {
     return `
     <aside class="sidebar" id="appSidebar">
       <div class="sidebar-brand">
-                <div class="brand-icon"><img src="${this.getSchoolLogo()}" alt="School Logo" class="brand-logo-img" onerror="this.style.display='none';this.parentElement.textContent='AB';"></div>
-        <div class="brand-text">Al Bilawal Soomro</div>
+        <div class="brand-icon">
+          <img src="${this.getSchoolLogo()}" alt="Al Bilawal Public School" class="brand-logo-img"
+            onerror="this.onerror=null;this.src='assets/images/logo.png';">
+        </div>
+        <div class="brand-text">Al Bilawal<br><small style="font-size:0.65rem;opacity:.85;font-weight:500;">Public School</small></div>
       </div>
       <nav class="sidebar-nav">
         <div class="nav-section-title">Main</div>
